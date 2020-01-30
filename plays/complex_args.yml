@@ -1,0 +1,7 @@
+---
+
+- hosts: node
+  vars:
+      test: true
+  roles:
+  - complex_args
