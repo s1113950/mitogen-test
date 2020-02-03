@@ -1,13 +1,34 @@
 ---
 # validates patch https://github.com/dw/mitogen/pull/658 via `make complex-args-test`
 
+# checks complex python vars as well as jinja in the python interpreter
+- name: set redhat special python
+  set_fact:
+    special_python: source /opt/rh/rh-python36/enable && python
+  when: ansible_os_family == 'RedHat'
+
+- name: set darwin "special" python
+  block:
+    - name: create temp file to source
+      file:
+        path: /tmp/fake
+        state: touch
+
+    - name: set python using sourced file
+      set_fact:
+        special_python: source /tmp/fake && python
+  when: ansible_os_family == 'Darwin'
+
 - name: run get_url with specially-sourced python
   get_url:
     url: https://cdn0.iconfinder.com/data/icons/tiny-icons-1/100/tiny-08-512.png
     dest: "/tmp/"
     mode: 0644
   vars:
-    ansible_python_interpreter: source /opt/rh/rh-python36/enable && python
+    ansible_python_interpreter: "{{ special_python }}"
+  environment:
+    https_proxy: "{{ lookup('env', 'https_proxy')|default('') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy')|default('') }}"
 
 - name: run get_url with specially-sourced python including jinja
   get_url:
@@ -17,10 +38,13 @@
   vars:
     ansible_python_interpreter: >
       {% if test|bool == true %}
-        source /opt/rh/rh-python36/enable && python
+        {{ special_python }}
       {% else %}
         python 
       {% endif %}
+  environment:
+    https_proxy: "{{ lookup('env', 'https_proxy')|default('') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy')|default('') }}"
 
 # ripped from https://github.com/ansible/ansible/pull/50163/files#diff-2efff5ba3589af60c1010f00a234ef57 to verify that it works
 - name: ensure we can override ansible_python_interpreter
