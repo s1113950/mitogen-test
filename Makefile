@@ -13,6 +13,9 @@ ANSIBLE_EXTRA_ARGS ?= -vv
 
 # set this to dynamically change user for test runs
 ANSIBLE_USER ?= ""
+# set this to not enter password for every test run
+ANSIBLE_SSH_PASS ?= ""
+ANSIBLE_SUDO_PASS ?= ""
 
 $(ACTIVATE): requirements.txt $(MITOGEN_INSTALL)
 	@test -d $(VIRTUALENV_DIR) || python3 -m venv $(VIRTUALENV_DIR)
@@ -23,5 +26,7 @@ $(MITOGEN_INSTALL):
 	@cd $(MITOGEN_INSTALL_DIR)/mitogen && git checkout complexAnsiblePythonInterpreterArg && git pull origin complexAnsiblePythonInterpreterArg
 
 complex-args-test: $(ACTIVATE)
-	@. $(ACTIVATE); ansible-playbook $(ANSIBLE_EXTRA_ARGS) -i inventory/local -b plays/complex_args.yml -k -K \
+	@. $(ACTIVATE); ansible-playbook $(ANSIBLE_EXTRA_ARGS) -i inventory/local -b plays/complex_args.yml \
+	$(shell [ -z $(ANSIBLE_SSH_PASS) ] && echo "-k" || echo "-e ansible_ssh_pass=$(ANSIBLE_SSH_PASS)") \
+	$(shell [ -z $(ANSIBLE_SUDO_PASS) ] && echo "-K" || echo "-e ansible_sudo_pass=$(ANSIBLE_SUDO_PASS)") \
 	$(shell [ -z $(ANSIBLE_USER) ] && echo "-u $(USER)" || echo "-e ansible_user=$(ANSIBLE_USER)")

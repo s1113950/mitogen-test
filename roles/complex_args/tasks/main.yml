@@ -190,7 +190,7 @@
     assert:
       that:
       - auto_out.ansible_facts.discovered_interpreter_python == '/usr/bin/python'
-    when: os_family == 'darwin'
+    when: os_family == 'Darwin'
 
   always:
   - meta: clear_facts

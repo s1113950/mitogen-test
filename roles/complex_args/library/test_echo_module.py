@@ -21,7 +21,7 @@ def main():
 
     result['ansible_facts'] = module.params['facts']
     # revert the Mitogen OSX tweak since discover_interpreter() doesn't return this info
-    if sys.platform == 'darwin' and sys.executable.startswith('/usr/bin/python'):
+    if sys.platform == 'darwin' and sys.executable != '/usr/bin/python':
         sys.executable = sys.executable[:-3]
     result['running_python_interpreter'] = sys.executable
 
