@@ -3,8 +3,17 @@
 
 # checks complex python vars as well as jinja in the python interpreter
 - name: set redhat special python
-  set_fact:
-    special_python: source /opt/rh/rh-python36/enable && python
+  block:
+    - name: ensure rh-python36 is installed
+      package:
+        name:
+          - rh-python36
+          - rh-python36-python-devel
+        state: present
+
+    - name: set special python fact
+      set_fact:
+        special_python: source /opt/rh/rh-python36/enable && python
   when: ansible_os_family == 'RedHat'
 
 - name: set darwin "special" python
