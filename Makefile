@@ -23,5 +23,5 @@ $(MITOGEN_INSTALL):
 	@cd $(MITOGEN_INSTALL_DIR)/mitogen && git checkout complexAnsiblePythonInterpreterArg && git pull origin complexAnsiblePythonInterpreterArg
 
 complex-args-test: $(ACTIVATE)
-	. $(ACTIVATE); ansible-playbook $(ANSIBLE_EXTRA_ARGS) -i inventory/local -b plays/complex_args.yml -k -K \
+	@. $(ACTIVATE); ansible-playbook $(ANSIBLE_EXTRA_ARGS) -i inventory/local -b plays/complex_args.yml -k -K \
 	$(shell [ -z $(ANSIBLE_USER) ] && echo "-u $(USER)" || echo "-e ansible_user=$(ANSIBLE_USER)")
