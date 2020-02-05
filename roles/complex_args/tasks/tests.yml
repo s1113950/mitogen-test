@@ -56,9 +56,9 @@
     url: https://cdn0.iconfinder.com/data/icons/tiny-icons-1/100/tiny-08-512.png
     dest: "/tmp/"
     mode: 0644
-    # centos6 has python2.6 which has an SNI issue, to avoid overcomplicating python install will ignore certs for centos6
+    # centos6 has python2.6 and ubuntu:14.04 has 2.7.6 which have an SNI issue; to avoid overcomplicating python install will ignore certs
     validate_certs: |
-      {% if container_image not in ('centos:6', 'centos:centos6') %}
+      {% if container_image not in ('centos:6', 'centos:centos6', 'ubuntu:14.04', 'ubuntu:trusty-20191217', 'ubuntu:trusty') %}
         True
       {% else %}
         False
