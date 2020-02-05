@@ -12,7 +12,7 @@
         no_proxy: "{{ lookup('env', 'no_proxy')|default('') }}"
         PATH: "{{ lookup('env', 'PATH') }}"
 
-    - name: create test container
+    - name: create test container {{ container_image }}
       docker_container:
         name: testMitogen
         image: "{{ container_image }}"
@@ -21,7 +21,7 @@
         command: sleep infinity
 
     - name: install python into container for mitogen
-      shell: docker exec testMitogen bash -c "yum install -y python3 && ln -s /usr/bin/python3 /usr/bin/python"
+      shell: docker exec testMitogen bash -c "yum install -y python3 && (test -f /usr/bin/python || ln -s /usr/bin/python3 /usr/bin/python)"
       environment:
         PATH: "{{ lookup('env', 'PATH') }}"
       when: "'centos' in container_image"
