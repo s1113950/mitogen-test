@@ -1,41 +1,55 @@
 ---
 # checks complex python vars as well as jinja in the python interpreter
-- name: set redhat special python
+
+- name: rerun setup if running in container to get new ansible_* vars
+  setup:
+  when: use_docker.lower() == 'true'
+
+
+- name: test source command only available outside of container
   block:
-    - name: ensure rh-python36 is installed
-      package:
-        name:
-          - rh-python36
-          - rh-python36-python-devel
-        state: present
+  - name: set redhat special python
+    block:
+      - name: ensure rh-python36 is installed
+        package:
+          name:
+            - rh-python36
+            - rh-python36-python-devel
+          state: present
 
-    - name: set special python fact
-      set_fact:
-        special_python: source /opt/rh/rh-python36/enable && python
-  when: ansible_os_family == 'RedHat'
+      - name: set special python fact
+        set_fact:
+          special_python: source /opt/rh/rh-python36/enable && python
+    when: ansible_os_family == 'RedHat'
 
-- name: set darwin "special" python
-  block:
-    - name: create temp file to source
-      file:
-        path: /tmp/fake
-        state: touch
+  - name: set darwin "special" python
+    block:
+      - name: create temp file to source
+        file:
+          path: /tmp/fake
+          state: touch
 
-    - name: set python using sourced file
-      set_fact:
-        special_python: source /tmp/fake && python
-  when: ansible_os_family == 'Darwin'
+      - name: set python using sourced file
+        set_fact:
+          special_python: source /tmp/fake && python
+    when: ansible_os_family == 'Darwin'
 
-- name: run get_url with specially-sourced python
-  get_url:
-    url: https://cdn0.iconfinder.com/data/icons/tiny-icons-1/100/tiny-08-512.png
-    dest: "/tmp/"
-    mode: 0644
-  vars:
-    ansible_python_interpreter: "{{ special_python }}"
-  environment:
-    https_proxy: "{{ lookup('env', 'https_proxy')|default('') }}"
-    no_proxy: "{{ lookup('env', 'no_proxy')|default('') }}"
+  - name: run get_url with specially-sourced python
+    get_url:
+      url: https://cdn0.iconfinder.com/data/icons/tiny-icons-1/100/tiny-08-512.png
+      dest: "/tmp/"
+      mode: 0644
+    vars:
+      ansible_python_interpreter: "{{ special_python }}"
+    environment:
+      https_proxy: "{{ lookup('env', 'https_proxy')|default('') }}"
+      no_proxy: "{{ lookup('env', 'no_proxy')|default('') }}"
+  when: use_docker.lower() == 'false'
+
+- name: fake setting special_python val if running in docker since no source cmd
+  set_fact:
+    special_python: python
+  when: use_docker.lower() == 'true'
 
 - name: run get_url with specially-sourced python including jinja
   get_url:
@@ -182,7 +196,7 @@
       - (auto_out.ansible_facts.discovered_interpreter_python == '/usr/bin/python' and distro_version is version('8','<')) or distro_version is version('8','>=')
       # rhel 8+
       - (auto_out.ansible_facts.discovered_interpreter_python == '/usr/libexec/platform-python' and distro_version is version('8','>=')) or distro_version is version('8','<')
-    when: distro == 'redhat'
+    when: distro in ('redhat', 'centos')
 
   - name: ubuntu assertions
     assert:
