@@ -20,11 +20,27 @@
         recreate: yes
         command: sleep infinity
 
+    - name: get distro info
+      set_fact:
+        distro: '{{ ansible_distribution | default("unknown") | lower }}'
+
+    - name: set python install cmd based on distro
+      block:
+        - name: set python install cmd for rhel-based distros
+          set_fact:
+            # centos8 doesn't have the python target
+            python_install_cmd: yum install -y python || (yum install -y python3 && ln -s /usr/bin/python3 /usr/bin/python)
+          when: "'centos' in container_image"
+
+        - name: set python install cmd for rhel-based distros
+          set_fact:
+            python_install_cmd: apt-get install -y python
+          when: "'ubuntu' in container_image"
+
     - name: install python into container for mitogen
-      shell: docker exec testMitogen bash -c "yum install -y python3 && (test -f /usr/bin/python || ln -s /usr/bin/python3 /usr/bin/python)"
+      shell: docker exec testMitogen bash -c "{{ python_install_cmd }}"
       environment:
         PATH: "{{ lookup('env', 'PATH') }}"
-      when: "'centos' in container_image"
 
     - name: add container to inventory
       add_host:

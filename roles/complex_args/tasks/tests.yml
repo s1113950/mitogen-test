@@ -56,6 +56,13 @@
     url: https://cdn0.iconfinder.com/data/icons/tiny-icons-1/100/tiny-08-512.png
     dest: "/tmp/"
     mode: 0644
+    # centos6 has python2.6 which has an SNI issue, to avoid overcomplicating python install will ignore certs for centos6
+    validate_certs: |
+      {% if container_image not in ('centos:6', 'centos:centos6') %}
+        True
+      {% else %}
+        False
+      {% endif %}
   vars:
     ansible_python_interpreter: >
       {% if test|bool == true %}
