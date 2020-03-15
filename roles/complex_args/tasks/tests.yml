@@ -49,12 +49,12 @@
 - name: fake setting special_python val if running in docker in non-rhel8 systems since no source cmd
   set_fact:
     special_python: python
-  when: use_docker.lower() == 'true' and not "'rhel8' in container_image"
+  when: "use_docker.lower() == 'true' and not 'rhel8' in container_image"
 
 - name: fake setting special_python val if running in docker in rhel8 systems since no source cmd
   set_fact:
     special_python: /usr/libexec/platform-python
-  when: use_docker.lower() == 'true' and "'rhel8' in container_image"
+  when: "use_docker.lower() == 'true' and 'rhel8' in container_image"
 
 - name: run get_url with specially-sourced python including jinja
   get_url:

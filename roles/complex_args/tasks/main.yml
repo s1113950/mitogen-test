@@ -7,10 +7,7 @@
     - name: install deps
       pip:
         name: docker
-      environment:
-        https_proxy: "{{ lookup('env', 'https_proxy')|default('') }}"
-        no_proxy: "{{ lookup('env', 'no_proxy')|default('') }}"
-        PATH: "{{ lookup('env', 'PATH') }}"
+        executable: pip3
 
     - name: create test container {{ container_image }}
       docker_container:
@@ -19,12 +16,13 @@
         state: started
         recreate: yes
         command: sleep infinity
+      vars:
+        # Mac Catalina does weird stuff to /usr/bin/python
+        # (`which python` returns /usr/bin/python which is python3 when you call `python` only but `python2` otherwise)
+        # TODO: don't force this to be python3?
+        ansible_python_interpreter: /usr/bin/python3
 
-    - name: get distro info
-      set_fact:
-        distro: '{{ ansible_distribution | default("unknown") | lower }}'
-
-    - name: set python install cmd based on distro
+    - name: set python install cmd based on distro (example -- ubuntu 20.04 container has no python by default)
       block:
         - name: set python install cmd for rhel-based distros
           set_fact:
