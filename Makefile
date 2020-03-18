@@ -22,7 +22,7 @@ USE_DOCKER ?= "false"
 # only used if USE_DOCKER is set
 
 # supported images:
-# centos 6,7,8
+# centos 6,7,8,8.1.1911
 # ubuntu 14.04,16.04,18.04,19.10,20.04
 # roboxes/rhel8:2.0.6
 CONTAINER_IMAGE ?= "centos:8"
