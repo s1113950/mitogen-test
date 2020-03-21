@@ -36,7 +36,7 @@
 
   - name: run get_url with specially-sourced python
     get_url:
-      url: https://cdn0.iconfinder.com/data/icons/tiny-icons-1/100/tiny-08-512.png
+      url: https://google.com
       dest: "/tmp/"
       mode: 0644
     vars:
@@ -58,7 +58,7 @@
 
 - name: run get_url with specially-sourced python including jinja
   get_url:
-    url: https://cdn0.iconfinder.com/data/icons/tiny-icons-1/100/tiny-08-512.png
+    url: https://google.com
     dest: "/tmp/"
     mode: 0644
     # centos6 has python2.6 and ubuntu:14.04 has 2.7.6 which have an SNI issue; to avoid overcomplicating python install will ignore certs
