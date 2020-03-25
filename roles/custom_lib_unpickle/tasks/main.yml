@@ -1,0 +1,7 @@
+---
+
+# validates https://github.com/dw/mitogen/issues/689
+- name: Test that license has not expired
+  license_check:
+    license_file: "{{ license_file }}"
+  delegate_to: localhost
