@@ -2,7 +2,6 @@
 
 # ripped from https://github.com/dw/mitogen/issues/689#issuecomment-602702713
 from ansible.module_utils.basic import AnsibleModule
-from ansible.utils.display import Display
 from datetime import datetime
 from datetime import timedelta
 import re

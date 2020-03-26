@@ -28,7 +28,7 @@ TEST_ARGS := -e test_dir=$(TEST)
 ifeq ($(TEST),complex_args)
     TEST_ARGS := $(TEST_ARGS) -e test=true
 else ifeq ($(TEST),custom_lib_unpickle)
-    TEST_ARGS := $(TEST_ARGS) -e license_file=roles/custom_lib_unpickle/library/license_file.txt
+    TEST_ARGS := $(TEST_ARGS)
 endif
 
 

@@ -1,5 +1,8 @@
 ---
+# will run this through docker to test it on centos6, so no delegate_to since that's already called
+- name: Create license file on docker host
+  shell: echo "LICENSE" > /tmp/license_file.txt
+
 - name: Test that license has not expired
   license_check:
-    license_file: "{{ license_file }}"
-  delegate_to: localhost
+    license_file: /tmp/license_file.txt
