@@ -17,34 +17,34 @@ ANSIBLE_USER ?= ""
 ANSIBLE_SSH_PASS ?= ""
 ANSIBLE_SUDO_PASS ?= $(ANSIBLE_SSH_PASS)
 
-# set this to true to deploy a container of type CONTAINER_BASE_OS and run tests on that locally
-USE_DOCKER ?= "false"
-# only used if USE_DOCKER is set
-
-# supported images:
-# centos 6,7,8,8.1.1911
-# ubuntu 14.04,16.04,18.04,19.10,20.04
-# roboxes/rhel8:2.0.6
+# set this to false to deploy a container of type CONTAINER_BASE_OS and run tests on that
+USE_DOCKER ?= true
+# only used if USE_DOCKER is true
 CONTAINER_IMAGE ?= "centos:8"
+
+TEST_ARGS := -e test_dir=$(TEST)
+
+# special test args section
+ifeq ($(TEST),complex_args)
+    TEST_ARGS := $(TEST_ARGS) -e test=true
+else ifeq ($(TEST),custom_lib_unpickle)
+    TEST_ARGS := $(TEST_ARGS) -e license_file=roles/custom_lib_unpickle/library/license_file.txt
+endif
+
 
 $(ACTIVATE): requirements.txt $(MITOGEN_INSTALL)
 	@test -d $(VIRTUALENV_DIR) || python3 -m venv $(VIRTUALENV_DIR)
 	@. $(ACTIVATE); pip install --upgrade-strategy only-if-needed -r requirements.txt
 
+#@cd $(MITOGEN_INSTALL_DIR)/mitogen && git checkout complexAnsiblePythonInterpreterArg && git pull origin complexAnsiblePythonInterpreterArg
 $(MITOGEN_INSTALL):
 	@test -f $(MITOGEN_INSTALL) || rm -rf $(MITOGEN_INSTALL_DIR)/mitogen && git clone https://github.com/s1113950/mitogen.git $(MITOGEN_INSTALL_DIR)/mitogen
-	@cd $(MITOGEN_INSTALL_DIR)/mitogen && git checkout complexAnsiblePythonInterpreterArg && git pull origin complexAnsiblePythonInterpreterArg
 
-complex-args-test: $(ACTIVATE)
-	@. $(ACTIVATE); ansible-playbook $(ANSIBLE_EXTRA_ARGS) -i inventory/local \
-	-e use_docker=$(USE_DOCKER) -e container_image=$(CONTAINER_IMAGE) -b plays/complex_args.yml \
-	$(shell [ -z $(ANSIBLE_SSH_PASS) ] && echo "-k" || echo "-e ansible_ssh_pass=$(ANSIBLE_SSH_PASS)") \
-	$(shell [ -z $(ANSIBLE_SUDO_PASS) ] && echo "-K" || echo "-e ansible_sudo_pass=$(ANSIBLE_SUDO_PASS)") \
-	$(shell [ -z $(ANSIBLE_USER) ] && echo "-u $(USER)" || echo "-e ansible_user=$(ANSIBLE_USER)")
 
-custom-lib-unpickle-test: $(ACTIVATE)
-	@. $(ACTIVATE); ansible-playbook $(ANSIBLE_EXTRA_ARGS) -i inventory/local -b plays/custom_lib_unpickle.yml \
-	-e license_file=roles/custom_lib_unpickle/library/license_file.txt \
+run-test: $(ACTIVATE)
+	. $(ACTIVATE); ansible-playbook $(ANSIBLE_EXTRA_ARGS) -i inventory/local \
+	-e use_docker=$(USE_DOCKER) -e container_image=$(CONTAINER_IMAGE) -b plays/run_test.yml \
+	$(TEST_ARGS) \
 	$(shell [ -z $(ANSIBLE_SSH_PASS) ] && echo "-k" || echo "-e ansible_ssh_pass=$(ANSIBLE_SSH_PASS)") \
 	$(shell [ -z $(ANSIBLE_SUDO_PASS) ] && echo "-K" || echo "-e ansible_sudo_pass=$(ANSIBLE_SUDO_PASS)") \
 	$(shell [ -z $(ANSIBLE_USER) ] && echo "-u $(USER)" || echo "-e ansible_user=$(ANSIBLE_USER)")

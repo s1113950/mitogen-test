@@ -1,7 +1,4 @@
 ---
-# validates patch https://github.com/dw/mitogen/pull/658 via `make complex-args-test`
-# if USE_DOCKER is set, runs tests on a newly created container instead of plain localhost
-
 - name: set up test container and run tests inside it
   block:
     - name: install deps
@@ -55,9 +52,9 @@
 
     - name: run tests
       delegate_to: testMitogen
-      import_tasks: tests.yml
+      import_tasks: "{{ role_path }}/{{ test_dir }}/tests.yml"
   when: use_docker.lower() == 'true'
 
 - name: run tests on localhost
-  import_tasks: tests.yml
+  import_tasks: "{{ role_path }}/{{ test_dir }}/tests.yml"
   when: use_docker.lower() == 'false'

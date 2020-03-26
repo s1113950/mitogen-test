@@ -2,4 +2,4 @@
 
 - hosts: node
   roles:
-  - custom_lib_unpickle
+  - run_test
