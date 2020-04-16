@@ -10,6 +10,8 @@ MITOGEN_INSTALL_DIR := /tmp
 MITOGEN_INSTALL := $(MITOGEN_INSTALL_DIR)/mitogen/MANIFEST.in
 # useful for testing dev branches
 MITOGEN_INSTALL_BRANCH ?= master
+# set this to /path/to/local/mitogen/branch to use it without having to 'git commit' repeatedly
+USE_LOCAL_MITOGEN ?= ""
 
 ANSIBLE_EXTRA_ARGS ?= -vv
 
@@ -41,14 +43,16 @@ $(ACTIVATE): requirements.txt $(MITOGEN_INSTALL)
 
 $(MITOGEN_INSTALL):
 	@test -f $(MITOGEN_INSTALL) || rm -rf $(MITOGEN_INSTALL_DIR)/mitogen && git clone https://github.com/s1113950/mitogen.git $(MITOGEN_INSTALL_DIR)/mitogen
+	@cd $(MITOGEN_INSTALL_DIR)/mitogen && git checkout $(MITOGEN_INSTALL_BRANCH) && git pull origin $(MITOGEN_INSTALL_BRANCH)
 
 
-# helps with debugging PRs, set MITOGEN_INSTALL_BRANCH to use
-ensure-branch-checked-out:
-	@cd $(MITOGEN_INSTALL_DIR)/mitogen && git fetch && git checkout $(MITOGEN_INSTALL_BRANCH) && git pull origin $(MITOGEN_INSTALL_BRANCH)
+use-local-mitogen:
+ifneq ($(USE_LOCAL_MITOGEN),"")
+	rsync -a $(USE_LOCAL_MITOGEN)/ $(MITOGEN_INSTALL_DIR)/mitogen
+endif
 
 
-run-test: $(ACTIVATE) ensure-branch-checked-out
+run-test: $(ACTIVATE) use-local-mitogen
 	@. $(ACTIVATE); ansible-playbook $(ANSIBLE_EXTRA_ARGS) -i inventory/local \
 	-e use_docker=$(USE_DOCKER) -e container_image=$(CONTAINER_IMAGE) -b plays/run_test.yml \
 	$(TEST_ARGS) \
