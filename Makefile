@@ -42,9 +42,11 @@ $(ACTIVATE): requirements.txt $(MITOGEN_INSTALL)
 $(MITOGEN_INSTALL):
 	@test -f $(MITOGEN_INSTALL) || rm -rf $(MITOGEN_INSTALL_DIR)/mitogen && git clone https://github.com/s1113950/mitogen.git $(MITOGEN_INSTALL_DIR)/mitogen
 
+
 # helps with debugging PRs, set MITOGEN_INSTALL_BRANCH to use
 ensure-branch-checked-out:
 	@cd $(MITOGEN_INSTALL_DIR)/mitogen && git fetch && git checkout $(MITOGEN_INSTALL_BRANCH) && git pull origin $(MITOGEN_INSTALL_BRANCH)
+
 
 run-test: $(ACTIVATE) ensure-branch-checked-out
 	@. $(ACTIVATE); ansible-playbook $(ANSIBLE_EXTRA_ARGS) -i inventory/local \
