@@ -48,7 +48,7 @@ $(MITOGEN_INSTALL):
 
 use-local-mitogen:
 ifneq ($(USE_LOCAL_MITOGEN),"")
-	rsync -a $(USE_LOCAL_MITOGEN)/ $(MITOGEN_INSTALL_DIR)/mitogen
+	@rsync -a $(USE_LOCAL_MITOGEN)/ $(MITOGEN_INSTALL_DIR)/mitogen
 endif
 
 
