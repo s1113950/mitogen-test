@@ -14,6 +14,9 @@ Validates patch https://github.com/dw/mitogen/pull/658
 ### custom_lib_unpickle
 Validates https://github.com/dw/mitogen/issues/689
 
+### wait_for_connection
+Validates https://github.com/dw/mitogen/issues/655
+
 #### Supported docker images:
 Set `CONTAINER_IMAGE` (optionally) to one of the following:
 
