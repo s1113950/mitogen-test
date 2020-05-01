@@ -43,7 +43,6 @@ $(ACTIVATE): requirements.txt $(MITOGEN_INSTALL)
 
 $(MITOGEN_INSTALL):
 	@test -f $(MITOGEN_INSTALL) || rm -rf $(MITOGEN_INSTALL_DIR)/mitogen && git clone https://github.com/s1113950/mitogen.git $(MITOGEN_INSTALL_DIR)/mitogen
-	@cd $(MITOGEN_INSTALL_DIR)/mitogen && git checkout $(MITOGEN_INSTALL_BRANCH) && git pull origin $(MITOGEN_INSTALL_BRANCH)
 
 
 use-local-mitogen:
@@ -52,7 +51,13 @@ ifneq ($(USE_LOCAL_MITOGEN),"")
 endif
 
 
+# ensure we always have the right version of mitogen we want, and then kick off tests
+# weird '|| true' thing is because tags can't be pulled that way
 run-test: $(ACTIVATE) use-local-mitogen
+ifeq ($(USE_LOCAL_MITOGEN),"")
+	@cd $(MITOGEN_INSTALL_DIR)/mitogen && git fetch && git checkout $(MITOGEN_INSTALL_BRANCH) && (git pull origin $(MITOGEN_INSTALL_BRANCH) || true)
+endif
+	
 	@. $(ACTIVATE); ansible-playbook $(ANSIBLE_EXTRA_ARGS) -i inventory/local \
 	-e use_docker=$(USE_DOCKER) -e container_image=$(CONTAINER_IMAGE) -b plays/run_test.yml \
 	$(TEST_ARGS) \
