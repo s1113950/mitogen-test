@@ -7,5 +7,9 @@
     foo: "fooFooFOO"
     # Test having the filter plugin loaded early
     blip: "{{ foo |alikins.collection_inspect.collection_inspect }}"
+    dummy: "dummy"
+    loader_info: "{{ dummy|alikins.collection_inspect.collection_inspect }}"
+  tags:
+    - a_become_play_tag
   roles:
   - run_test

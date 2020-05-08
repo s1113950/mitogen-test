@@ -2,10 +2,11 @@
 # NOTE: related to the plays/collections.yml test
 # https://github.com/dw/mitogen/issues/652
 # ansible-galaxy collection install alikins.collection_inspect
-# ripped from https://github.com/alikins/collection_inspect/commit/56c7aba6ec6284fb58c07f576647d81c53782218
+# ripped from https://github.com/alikins/collection_inspect/tree/master/playbooks
 # How it works with vanilla ansible 2.9.6: ".venv/bin/ansible-playbook roles/run_test/collections/tests.yml"
 # TEST=collections PLAYBOOK=collections-roles USE_DOCKER=false make run-test
 
+### test_vars
 - name: "Test collection_inspect module and module_utils loaded from alikins.collection_inspect collection"
   alikins.collection_inspect.collection_inspect:
     args:
@@ -19,3 +20,82 @@
 - name: show vars plugins for collection_inspect
   debug:
     msg: "{{ vars|to_nice_json }}"
+### end test_vars
+
+
+### test_filters, note `.do_nothing` didn't exist and neither did `collection_spect`
+- debug:
+    var: loader_info
+
+- name: set a fact with another filter invocation
+  set_fact:
+    more_loader_info: "{{ dummy|alikins.collection_inspect.collection_inspect }}"
+
+- name: show the second filter results
+  debug:
+    var: more_loader_info
+### end test_filters
+
+
+### test_lookup
+- name: try to find lookup plugin alikins.collection_inspect.collection_inspect
+  set_fact:
+    blip: "{{ lookup('alikins.collection_inspect.collection_inspect', 'dummy') }}"
+
+# NOTE: doesn't show anything
+- name: show lookup loader info data
+  debug:
+    var: lookup_loader_info
+### end test_lookup
+
+### test_collection_inspect
+- name: test module get_collection_inspect
+  alikins.collection_inspect.get_collection_inspect:
+    args:
+  register: get_collection_inspect_results
+
+- name: show get_collection_inspect_results
+  debug:
+    var: get_collection_inspect_results
+
+- name: use debug from ansible builtin
+  ansible.builtin.debug:
+    msg: "trying to use the builtin debug"
+
+- name: use debug from ansible legacy
+  ansible.legacy.debug:
+    msg: "trying to use the legacy debug"
+
+- name: use find module
+  find:
+    paths: /tmp/col_inspect_test
+    recurse: no
+
+- name: use find module builtin
+  ansible.builtin.find:
+    paths: /tmp/col_inspect_test
+    recurse: no
+
+- name: show collection_inspect filter results
+  debug:
+    msg: "{{ foo |alikins.collection_inspect.collection_inspect }}"
+
+- name: test module get_collection_inspect
+  alikins.collection_inspect.collection_inspect_no_module_utils:
+    args:
+  register: collection_inspect_with_no_module_utils_results
+
+- name: show collection_inspect_with_no_module_utils_results
+  debug:
+    var: collection_inspect_with_no_module_utils_results
+
+- name: test module collection_inspect
+  alikins.collection_inspect.collection_inspect:
+    args:
+  register: collection_inspect_results
+
+- name: show collection_inspect_results
+  debug:
+    var: collection_inspect_results
+
+### end test_collection_inspect
