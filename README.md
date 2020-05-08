@@ -2,9 +2,12 @@
 Place to store sample playbooks for the purpose of testing mitogen patches
 
 ## How to run a test
-`TEST=${TEST_DIR} make run-test` where `TEST_DIR` is a subdir of the `run_test` role.
-
+Most tests: `TEST=${TEST_DIR} make run-test` where `TEST_DIR` is a subdir of the `run_test` role.
 Set `USE_DOCKER=false` to run on localhost.
+
+Collection playbook-level test:
+`PLAYBOOK=collections make run-test`
+
 
 ## Supported docker images:
 Set `CONTAINER_IMAGE` (optionally) to one of the following:
@@ -17,7 +20,11 @@ Set `CONTAINER_IMAGE` (optionally) to one of the following:
 
 Defaults to `centos:8`.
 
-## Subdirs
+
+## Tests in run_test
+
+### collections
+Validates https://github.com/dw/mitogen/issues/652
 
 ### complex_args
 Validates patch https://github.com/dw/mitogen/pull/658
@@ -27,3 +34,8 @@ Validates https://github.com/dw/mitogen/issues/689
 
 ### wait_for_connection
 Validates https://github.com/dw/mitogen/issues/655
+
+## Playbook-level tests
+
+### plays/collections.yml
+Validates https://github.com/dw/mitogen/issues/652

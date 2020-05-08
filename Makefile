@@ -28,6 +28,9 @@ CONTAINER_IMAGE ?= "centos:8"
 
 TEST_ARGS := -e test_dir=$(TEST)
 
+# which top-level playbook to run
+PLAYBOOK ?= run_test
+
 # special test args section
 ifeq ($(TEST),complex_args)
     TEST_ARGS := $(TEST_ARGS) -e test=true
@@ -59,7 +62,7 @@ ifeq ($(USE_LOCAL_MITOGEN),"")
 endif
 	
 	@. $(ACTIVATE); ansible-playbook $(ANSIBLE_EXTRA_ARGS) -i inventory/local \
-	-e use_docker=$(USE_DOCKER) -e container_image=$(CONTAINER_IMAGE) -b plays/run_test.yml \
+	-e use_docker=$(USE_DOCKER) -e container_image=$(CONTAINER_IMAGE) -b plays/$(PLAYBOOK).yml \
 	$(TEST_ARGS) \
 	$(shell [ -z $(ANSIBLE_SSH_PASS) ] && echo "-k" || echo "-e ansible_ssh_pass=$(ANSIBLE_SSH_PASS)") \
 	$(shell [ -z $(ANSIBLE_SUDO_PASS) ] && echo "-K" || echo "-e ansible_sudo_pass=$(ANSIBLE_SUDO_PASS)") \

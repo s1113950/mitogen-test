@@ -1,0 +1,21 @@
+---
+# NOTE: related to the plays/collections.yml test
+# https://github.com/dw/mitogen/issues/652
+# ansible-galaxy collection install alikins.collection_inspect
+# ripped from https://github.com/alikins/collection_inspect/commit/56c7aba6ec6284fb58c07f576647d81c53782218
+# How it works with vanilla ansible 2.9.6: ".venv/bin/ansible-playbook roles/run_test/collections/tests.yml"
+# TEST=collections PLAYBOOK=collections-roles USE_DOCKER=false make run-test
+
+- name: "Test collection_inspect module and module_utils loaded from alikins.collection_inspect collection"
+  alikins.collection_inspect.collection_inspect:
+    args:
+  register: module_result
+
+- name: Show collection_inspect module results
+  debug:
+    var: module_result
+
+# TODO: not sure if vars plugins are expected to work yet
+- name: show vars plugins for collection_inspect
+  debug:
+    msg: "{{ vars|to_nice_json }}"

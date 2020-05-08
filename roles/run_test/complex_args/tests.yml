@@ -1,4 +1,5 @@
 ---
+# https://github.com/dw/mitogen/pull/658
 # checks complex python vars as well as jinja in the python interpreter
 
 - name: rerun setup if running in container to get new ansible_* vars
