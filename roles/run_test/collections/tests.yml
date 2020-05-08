@@ -3,7 +3,6 @@
 # https://github.com/dw/mitogen/issues/652
 # ansible-galaxy collection install alikins.collection_inspect
 # ripped from https://github.com/alikins/collection_inspect/tree/master/playbooks
-# How it works with vanilla ansible 2.9.6: ".venv/bin/ansible-playbook roles/run_test/collections/tests.yml"
 # TEST=collections PLAYBOOK=collections-roles USE_DOCKER=false make run-test
 
 ### test_vars
