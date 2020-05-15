@@ -3,7 +3,7 @@
 # validates:
 # https://github.com/dw/mitogen/issues/716
 
-### TEST 716
+### TEST 716 --> TEST=misc CONTAINER_IMAGE=centos:7 ANSIBLE_VERSION=2.4.2 PYTHON_VERSION=2 make run-test
 - name: T00.00 Prepare file
   lineinfile:
     path: "/tmp/fileC"
