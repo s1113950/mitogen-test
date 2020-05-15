@@ -32,6 +32,9 @@ Validates patch https://github.com/dw/mitogen/pull/658
 ### custom_lib_unpickle
 Validates https://github.com/dw/mitogen/issues/689
 
+### misc
+Validates https://github.com/dw/mitogen/issues/716
+
 ### wait_for_connection
 Validates https://github.com/dw/mitogen/issues/655
 

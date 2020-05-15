@@ -1,0 +1,17 @@
+---
+# place for small bugs/generic fixes
+# validates:
+# https://github.com/dw/mitogen/issues/716
+
+### TEST 716
+- name: T00.00 Prepare file
+  lineinfile:
+    path: "/tmp/fileC"
+    line: "test"
+    create: yes
+
+- name: T00.01 Fetch file
+  fetch:
+    src: "/tmp/fileC"
+    dest: "/tmp/fileC"
+### END TEST 716
