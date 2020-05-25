@@ -21,16 +21,15 @@
 
     - name: set python install cmd based on distro (example -- ubuntu 20.04 container has no python by default)
       block:
+        - name: default to not installing any python
+          set_fact:
+            python_install_cmd: echo 'Mocking python install'
+
         - name: set python install cmd for rhel-based distros
           set_fact:
             # centos8 doesn't have the python target, and centos6 doesn't have python3 (needs rh-python3)
             python_install_cmd: yum install -y python || (yum install -y python3 && ln -s /usr/bin/python3 /usr/bin/python)
           when: "'centos' in container_image and not 'centos:8' in container_image"
-
-        - name: mock setting python install cmd for rhel8 and centos8 (will use /usr/libexec/platform-python)
-          set_fact:
-            python_install_cmd: echo 'using /usr/libexec/platform-python'
-          when: "'rhel8' in container_image or 'centos:8' in container_image"
 
         - name: set python install cmd for ubuntu distros
           set_fact:
@@ -39,7 +38,7 @@
           when: "'ubuntu' in container_image"
 
     - name: install python into container for mitogen
-      shell: docker exec testMitogen bash -c "{{ python_install_cmd }}"
+      shell: docker exec testMitogen sh -c "{{ python_install_cmd }}"
       environment:
         PATH: "{{ lookup('env', 'PATH') }}"
 

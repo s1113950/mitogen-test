@@ -18,6 +18,8 @@ Set `CONTAINER_IMAGE` (optionally) to one of the following:
 
 `roboxes/rhel8:2.0.6`
 
+`willhallonline/ansible:2.9-alpine`
+
 Defaults to `centos:8`.
 
 
