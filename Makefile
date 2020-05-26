@@ -19,6 +19,8 @@ ANSIBLE_USER ?= ""
 CONTAINER_IMAGE ?= "centos:8"
 # useful for testing dev branches
 MITOGEN_INSTALL_BRANCH ?= master
+# whether or not to install ANSIBLE_VERSION into the test venv; useful for bleeding edge ansible clones
+NO_INSTALL_ANSIBLE ?= ""
 # which top-level playbook to run
 PLAYBOOK ?= run_test
 # python2 or python3
@@ -57,10 +59,11 @@ ifneq ($(USE_LOCAL_MITOGEN),"")
 	@rsync -a $(USE_LOCAL_MITOGEN)/ $(MITOGEN_INSTALL_DIR)/mitogen
 endif
 
-
+# weird pip install thing is for supporting bleeding edge ansible, ex: git+https://github.com/nitzmahone/ansible.git@a7d0db69142134c2e36a0a62b81a32d9442792ef
 install-ansible:
-	@. $(ACTIVATE); [[ `pip freeze | grep ansible` == "ansible==$(ANSIBLE_VERSION)" ]] && true || pip install ansible==$(ANSIBLE_VERSION)
-
+ifeq ($(NO_INSTALL_ANSIBLE),"")
+	@. $(ACTIVATE); [[ `pip freeze | grep ansible` == "ansible==$(ANSIBLE_VERSION)" ]] && true || (pip install ansible==$(ANSIBLE_VERSION) || pip install $(ANSIBLE_VERSION))
+endif
 
 # ensure we always have the right version of mitogen we want, and then kick off tests
 # weird '|| true' thing is because tags can't be pulled that way
