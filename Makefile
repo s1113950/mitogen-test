@@ -57,20 +57,20 @@ $(MITOGEN_INSTALL):
 
 
 use-local-mitogen:
-ifneq ($(USE_LOCAL_MITOGEN),"")
+ifneq ($(strip $(USE_LOCAL_MITOGEN)),)
 	@rsync -a $(USE_LOCAL_MITOGEN)/ $(MITOGEN_INSTALL_DIR)/mitogen
 endif
 
 # weird pip install thing is for supporting bleeding edge ansible, ex: git+https://github.com/nitzmahone/ansible.git@a7d0db69142134c2e36a0a62b81a32d9442792ef
 install-ansible:
-ifeq ($(NO_INSTALL_ANSIBLE),"")
+ifneq ($(strip $(NO_INSTALL_ANSIBLE)),)
 	@. $(ACTIVATE); [[ `pip freeze | grep ansible` == "ansible==$(ANSIBLE_VERSION)" ]] && true || (pip install ansible==$(ANSIBLE_VERSION) || pip install $(ANSIBLE_VERSION))
 endif
 
 # ensure we always have the right version of mitogen we want, and then kick off tests
 # weird '|| true' thing is because tags can't be pulled that way
 run-test: $(ACTIVATE) use-local-mitogen install-ansible
-ifeq ($(USE_LOCAL_MITOGEN),"")
+ifeq ($(strip $(USE_LOCAL_MITOGEN)),)
 	@cd $(MITOGEN_INSTALL_DIR)/mitogen && git fetch && git checkout $(MITOGEN_INSTALL_BRANCH) && (git pull origin $(MITOGEN_INSTALL_BRANCH) || true)
 endif
 	
