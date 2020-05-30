@@ -17,6 +17,8 @@ ANSIBLE_VERSION ?= "2.9.6"
 ANSIBLE_USER ?= ""
 # only used if USE_DOCKER is true
 CONTAINER_IMAGE ?= "centos:8"
+# optional extra args passed to the container when it runs, like "-e arg=val -v..."
+CUSTOM_CONTAINER_ARGS ?= ""
 # useful for testing dev branches
 MITOGEN_INSTALL_BRANCH ?= master
 # whether or not to install ANSIBLE_VERSION into the test venv; useful for bleeding edge ansible clones
@@ -73,8 +75,8 @@ ifeq ($(USE_LOCAL_MITOGEN),"")
 endif
 	
 	@. $(ACTIVATE); ansible-playbook $(ANSIBLE_EXTRA_ARGS) -i inventory/local \
-	-e use_docker=$(USE_DOCKER) -e container_image=$(CONTAINER_IMAGE) -b plays/$(PLAYBOOK).yml \
-	$(TEST_ARGS) \
+	-e use_docker=$(USE_DOCKER) -e container_image=$(CONTAINER_IMAGE) -e "custom_container_args='$(CUSTOM_CONTAINER_ARGS)'" \
+	-b plays/$(PLAYBOOK).yml $(TEST_ARGS) \
 	$(shell [ -z $(ANSIBLE_SSH_PASS) ] && echo "-k" || echo "-e ansible_ssh_pass=$(ANSIBLE_SSH_PASS)") \
 	$(shell [ -z $(ANSIBLE_SUDO_PASS) ] && echo "-K" || echo "-e ansible_sudo_pass=$(ANSIBLE_SUDO_PASS) -e ansible_become_pass=$(ANSIBLE_SUDO_PASS)") \
 	$(shell [ -z $(ANSIBLE_USER) ] && echo "-u $(USER)" || echo "-e ansible_user=$(ANSIBLE_USER)")

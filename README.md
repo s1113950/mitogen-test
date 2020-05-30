@@ -18,7 +18,9 @@ Set `CONTAINER_IMAGE` (optionally) to one of the following:
 
 `roboxes/rhel8:2.0.6`
 
-`willhallonline/ansible:2.9-alpine`
+`willhallonline/ansible:2.9-alpine` from https://github.com/dw/mitogen/issues/673#issuecomment-633248152
+
+`fvissing/ansible:77389e9a8b9c` from https://github.com/dw/mitogen/issues/672#issuecomment-635515926
 
 Defaults to `centos:8`.
 

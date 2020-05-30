@@ -6,18 +6,29 @@
         name: docker
         executable: pip3
 
-    - name: create test container {{ container_image }}
+    # - name: create test container {{ container_image }}
+    #   docker_container:
+    #     name: testMitogen
+    #     image: "{{ container_image }}"
+    #     state: started
+    #     recreate: yes
+    #     command: sleep infinity
+    #   vars:
+    #     # Mac Catalina does weird stuff to /usr/bin/python
+    #     # (`which python` returns /usr/bin/python which is python3 when you call `python` only but `python2` otherwise)
+    #     # TODO: don't force this to be python3?
+    #     ansible_python_interpreter: /usr/bin/python3
+
+    # needed more flexibility so will shell out to create container
+    - name: stopping any old test container
       docker_container:
         name: testMitogen
-        image: "{{ container_image }}"
-        state: started
-        recreate: yes
-        command: sleep infinity
+        state: absent
       vars:
-        # Mac Catalina does weird stuff to /usr/bin/python
-        # (`which python` returns /usr/bin/python which is python3 when you call `python` only but `python2` otherwise)
-        # TODO: don't force this to be python3?
         ansible_python_interpreter: /usr/bin/python3
+
+    - name: create test container {{ container_image }}
+      shell: /usr/local/bin/docker run -d --name testMitogen {{ custom_container_args }} --rm {{ container_image }} sh -c "sleep infinity"
 
     - name: set python install cmd based on distro (example -- ubuntu 20.04 container has no python by default)
       block:
