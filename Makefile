@@ -17,6 +17,8 @@ ANSIBLE_VERSION ?= "2.9.6"
 ANSIBLE_USER ?= ""
 # only used if USE_DOCKER is true
 CONTAINER_IMAGE ?= "centos:8"
+# sometimes custom containers want to run something special other than sleep infinity
+CONTAINER_RUN_COMMAND ?= "sh -c sleep infinity"
 # optional extra args passed to the container when it runs, like "-e arg=val -v..."
 CUSTOM_CONTAINER_ARGS ?= ""
 # useful for testing dev branches
@@ -75,7 +77,8 @@ ifeq ($(strip $(USE_LOCAL_MITOGEN)),)
 endif
 	
 	@. $(ACTIVATE); ansible-playbook $(ANSIBLE_EXTRA_ARGS) -i inventory/local \
-	-e use_docker=$(USE_DOCKER) -e container_image=$(CONTAINER_IMAGE) -e "custom_container_args='$(CUSTOM_CONTAINER_ARGS)'" \
+	-e use_docker=$(USE_DOCKER) -e container_image=$(CONTAINER_IMAGE) \
+	-e "custom_container_args='$(CUSTOM_CONTAINER_ARGS)'" -e "container_run_command='$(CONTAINER_RUN_COMMAND)'" \
 	-b plays/$(PLAYBOOK).yml $(TEST_ARGS) \
 	$(shell [ -z $(ANSIBLE_SSH_PASS) ] && echo "-k" || echo "-e ansible_ssh_pass=$(ANSIBLE_SSH_PASS)") \
 	$(shell [ -z $(ANSIBLE_SUDO_PASS) ] && echo "-K" || echo "-e ansible_sudo_pass=$(ANSIBLE_SUDO_PASS) -e ansible_become_pass=$(ANSIBLE_SUDO_PASS)") \
