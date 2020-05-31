@@ -6,6 +6,8 @@ default: run-test
 
 
 ### VARS
+# sometimes we wanna run just a vanilla ansible command
+ANSIBLE_COMMAND ?= "ansible-playbook"
 # dynamically add more flags to playbooks
 ANSIBLE_EXTRA_ARGS ?= -vv
 # set this to not enter passwords for every test run
@@ -18,7 +20,7 @@ ANSIBLE_USER ?= ""
 # only used if USE_DOCKER is true
 CONTAINER_IMAGE ?= "centos:8"
 # sometimes custom containers want to run something special other than sleep infinity
-CONTAINER_RUN_COMMAND ?= "sh -c sleep infinity"
+CONTAINER_RUN_COMMAND ?= sh -c "sleep infinity"
 # optional extra args passed to the container when it runs, like "-e arg=val -v..."
 CUSTOM_CONTAINER_ARGS ?= ""
 # useful for testing dev branches
@@ -41,6 +43,10 @@ ifeq ($(TEST),complex_args)
     TEST_ARGS := $(TEST_ARGS) -e test=true
 else ifeq ($(TEST),custom_lib_unpickle)
     TEST_ARGS := $(TEST_ARGS)
+# special one-off for stuff like https://github.com/dw/mitogen/issues/672
+# "ansible localhost -m setup" broke in a python3.5 env with Mitogen
+else ifeq ($(TEST),ansible-setup)
+	TEST_ARGS := all -c docker -i 'testMitogen,' -e ansible_user=root -e ansible_python_interpreter=/usr/local/bin/python3 -m setup
 endif
 
 VIRTUALENV_DIR := .venv$(PYTHON_VERSION)
@@ -76,10 +82,12 @@ ifeq ($(strip $(USE_LOCAL_MITOGEN)),)
 	@cd $(MITOGEN_INSTALL_DIR)/mitogen && git fetch && git checkout $(MITOGEN_INSTALL_BRANCH) && (git pull origin $(MITOGEN_INSTALL_BRANCH) || true)
 endif
 	
-	@. $(ACTIVATE); ansible-playbook $(ANSIBLE_EXTRA_ARGS) -i inventory/local \
+	. $(ACTIVATE); $(ANSIBLE_COMMAND) $(ANSIBLE_EXTRA_ARGS) \
 	-e use_docker=$(USE_DOCKER) -e container_image=$(CONTAINER_IMAGE) \
-	-e "custom_container_args='$(CUSTOM_CONTAINER_ARGS)'" -e "container_run_command='$(CONTAINER_RUN_COMMAND)'" \
-	-b plays/$(PLAYBOOK).yml $(TEST_ARGS) \
+	-e container_run_command="'"'$(CONTAINER_RUN_COMMAND)'"'" \
+	$(TEST_ARGS) \
+	$(shell [[ $(ANSIBLE_COMMAND) == "ansible-playbook" ]] && echo "-b plays/$(PLAYBOOK).yml -i inventory/local") \
+	$(shell [ -z $(CUSTOM_CONTAINER_ARGS) ] && echo "-e custom_container_args=''" || echo "-e \"custom_container_args='$(CUSTOM_CONTAINER_ARGS)'\"") \
 	$(shell [ -z $(ANSIBLE_SSH_PASS) ] && echo "-k" || echo "-e ansible_ssh_pass=$(ANSIBLE_SSH_PASS)") \
 	$(shell [ -z $(ANSIBLE_SUDO_PASS) ] && echo "-K" || echo "-e ansible_sudo_pass=$(ANSIBLE_SUDO_PASS) -e ansible_become_pass=$(ANSIBLE_SUDO_PASS)") \
 	$(shell [ -z $(ANSIBLE_USER) ] && echo "-u $(USER)" || echo "-e ansible_user=$(ANSIBLE_USER)")

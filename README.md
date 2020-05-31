@@ -20,8 +20,6 @@ Set `CONTAINER_IMAGE` (optionally) to one of the following:
 
 `willhallonline/ansible:2.9-alpine` from https://github.com/dw/mitogen/issues/673#issuecomment-633248152
 
-`fvissing/ansible:77389e9a8b9c` from https://github.com/dw/mitogen/issues/672#issuecomment-635515926
-
 Defaults to `centos:8`.
 
 
@@ -46,3 +44,15 @@ Validates https://github.com/dw/mitogen/issues/655
 
 ### plays/collections.yml
 Validates https://github.com/dw/mitogen/issues/652
+
+### ansible tests (not ansible-playbook)
+Validates https://github.com/dw/mitogen/issues/672
+
+Run this to set up the test container:
+```
+TEST=misc CONTAINER_IMAGE=python:3.5.3-jessie make run-test
+```
+and then run this to test inside of it
+```
+TEST=ansible-setup ANSIBLE_COMMAND=ansible make run-test
+```
