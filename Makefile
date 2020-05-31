@@ -82,7 +82,7 @@ ifeq ($(strip $(USE_LOCAL_MITOGEN)),)
 	@cd $(MITOGEN_INSTALL_DIR)/mitogen && git fetch && git checkout $(MITOGEN_INSTALL_BRANCH) && (git pull origin $(MITOGEN_INSTALL_BRANCH) || true)
 endif
 	
-	. $(ACTIVATE); $(ANSIBLE_COMMAND) $(ANSIBLE_EXTRA_ARGS) \
+	@. $(ACTIVATE); $(ANSIBLE_COMMAND) $(ANSIBLE_EXTRA_ARGS) \
 	-e use_docker=$(USE_DOCKER) -e container_image=$(CONTAINER_IMAGE) \
 	-e container_run_command="'"'$(CONTAINER_RUN_COMMAND)'"'" \
 	$(TEST_ARGS) \
