@@ -48,11 +48,22 @@ Validates https://github.com/dw/mitogen/issues/652
 ### ansible tests (not ansible-playbook)
 Validates https://github.com/dw/mitogen/issues/672
 
-Run this to set up the test container:
+To set up test container:
 ```
 TEST=misc CONTAINER_IMAGE=python:3.5.3-jessie make run-test
 ```
-and then run this to test inside of it
+run to test inside of it:
 ```
 TEST=ansible-setup ANSIBLE_COMMAND=ansible make run-test
+```
+
+Validates https://github.com/dw/mitogen/issues/726
+
+To set up test container:
+```
+TEST=misc CONTAINER_IMAGE=centos:7 ANSIBLE_VERSION=2.9.9 make run-test
+```
+run to test inside of it:
+```
+TEST=ansible-setup-become ANSIBLE_COMMAND=ansible INSTALL_ANSIBLE=false ANSIBLE_SSH_PASS='***' make run-test
 ```
