@@ -1,0 +1,24 @@
+---
+# https://github.com/dw/mitogen/issues/734
+# TEST=perms CONTAINER_IMAGE=centos:8 ANSIBLE_VERSION=2.7.5 PYTHON_VERSION=2 make run-test
+
+- name: create dir owned by root
+  become: True
+  file:
+    path: /tmp/permsTestDir
+    state: directory
+    mode: 644
+
+- name: run something as a different user
+  shell: echo "foo"
+  become: True
+  become_method: su
+  become_user: "{{ ansible_user }}"
+
+# - name: Create first configuration
+#   shell: "echo '{{ gitolite_admin_key }}' > '{{ gitolite_path }}/adminkey.pub' && env -u PERL5LIB gitolite setup -pk '{{ gitolite_path }}/adminkey.pub' && rm '{{ gitolite_path }}/adminkey.pub'"
+#   args:
+#      creates: "{{ gitolite_path }}/.gitolite/conf/gitolite.conf"
+#   become: True
+#   become_method: su
+#   become_user: "{{ gitolite_user }}"

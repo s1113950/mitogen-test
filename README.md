@@ -37,6 +37,9 @@ Validates https://github.com/dw/mitogen/issues/689
 ### misc
 Validates https://github.com/dw/mitogen/issues/716
 
+### perms
+Validates https://github.com/dw/mitogen/issues/734
+
 ### wait_for_connection
 Validates https://github.com/dw/mitogen/issues/655
 
