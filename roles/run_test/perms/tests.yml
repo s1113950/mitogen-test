@@ -3,17 +3,15 @@
 # TEST=perms CONTAINER_IMAGE=centos:8 ANSIBLE_VERSION=2.7.5 PYTHON_VERSION=2 ANSIBLE_USER=$USER make run-test
 
 # run setup so we get ansible_user var
-- name: create dir owned by root
+- name: make ansible dir owned by root
   become: True
   file:
-    path: /tmp/permsTestDir
+    path: /root/.ansible
     state: directory
     mode: '0600'
 
 - name: run something as a different user
   shell: echo "foo"
-  args:
-    creates: /tmp/permsTestDir
   become: True
   become_method: su
   become_user: "{{ ansible_user }}"
