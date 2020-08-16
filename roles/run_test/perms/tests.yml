@@ -1,20 +1,32 @@
 ---
 # https://github.com/dw/mitogen/issues/734
-# TEST=perms CONTAINER_IMAGE=centos:8 ANSIBLE_VERSION=2.7.5 PYTHON_VERSION=2 ANSIBLE_USER=$USER make run-test
+# TEST=perms CONTAINER_IMAGE=centos:8 ANSIBLE_VERSION=2.7.5 PYTHON_VERSION=2 make run-test
+# NOTE: this issue uses ansible 2.7 which has no interpreter discovery
 
-# run setup so we get ansible_user var
-- name: make ansible dir owned by root
+- name: make dir owned by root
   become: True
   file:
     path: /root/.ansible
     state: directory
     mode: '0600'
+  vars:
+    ansible_python_interpreter: "/usr/libexec/platform-python"
+
+- name: create new test user in container
+  become: True
+  user:
+    name: dummy
+    shell: /bin/bash
+  vars:
+    ansible_python_interpreter: "/usr/libexec/platform-python"
 
 - name: run something as a different user
   shell: echo "foo"
   become: True
   become_method: su
-  become_user: "{{ ansible_user }}"
+  become_user: dummy
+  vars:
+    ansible_python_interpreter: "/usr/libexec/platform-python"
 
 # - name: Create first configuration
 #   shell: "echo '{{ gitolite_admin_key }}' > '{{ gitolite_path }}/adminkey.pub' && env -u PERL5LIB gitolite setup -pk '{{ gitolite_path }}/adminkey.pub' && rm '{{ gitolite_path }}/adminkey.pub'"
