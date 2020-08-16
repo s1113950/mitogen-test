@@ -1,20 +1,11 @@
 ---
 - name: set up test container and run tests inside it
   block:
-    # - setup:
-
-    - name: install python3 deps
+    - name: install python deps
       pip:
         name: docker
-      when: ansible_python.version.major == 3
-
-    - name: install python2 deps
-      pip:
-        name: docker-py
-      when: ansible_python.version.major == 2
-      # when: "{{ ansible_"
-      # vars:
-      #   ansible_python_interpreter: /usr/bin/python3
+      vars:
+        ansible_python_interpreter: /usr/bin/python3
 
     # - name: create test container {{ container_image }}
     #   docker_container:
@@ -29,14 +20,14 @@
     #     # TODO: don't force this to be python3?
     #     ansible_python_interpreter: /usr/bin/python3
 
-    # needed more flexibility so will shell out to create container
     - name: stopping any old test container
       docker_container:
         name: testMitogen
         state: absent
-      # vars:
-      #   ansible_python_interpreter: /usr/bin/python3
+      vars:
+        ansible_python_interpreter: /usr/bin/python3
 
+    # needed more flexibility so will shell out to create container
     - name: create test container {{ container_image }}
       shell: /usr/local/bin/docker run -d --name testMitogen {{ custom_container_args }} --rm {{ container_image }} {{ container_run_command }}
 
