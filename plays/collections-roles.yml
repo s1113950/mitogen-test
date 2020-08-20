@@ -1,5 +1,7 @@
 ---
 # Provides the setup for collections tests not from the top-level playbook
+# see collections.yml in same dir for another example
+# TEST=collections PLAYBOOK=collections-roles ANSIBLE_VERSION=2.10.0 make run-test
 
 - hosts: node
   gather_facts: false
