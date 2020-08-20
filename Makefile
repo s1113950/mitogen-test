@@ -14,7 +14,8 @@ ANSIBLE_EXTRA_ARGS ?= -vv
 ANSIBLE_SSH_PASS ?= ""
 ANSIBLE_SUDO_PASS ?= $(ANSIBLE_SSH_PASS)
 # dynamically change ansible install version
-ANSIBLE_VERSION ?= "2.9.6"
+# NOTE: to get ansible 2.10.0 before it's released to `ansible` we need `ansible-base`, so get git+https://github.com/ansible/ansible.git@v2.10.0
+ANSIBLE_VERSION ?= "2.10.0"
 # set this to dynamically change user for test runs
 ANSIBLE_USER ?= ""
 # only used if USE_DOCKER is true
@@ -71,11 +72,18 @@ ifneq ($(USE_LOCAL_MITOGEN),)
 	@rsync -a $(USE_LOCAL_MITOGEN)/ $(MITOGEN_INSTALL_DIR)/mitogen
 endif
 
-# weird pip install thing is for supporting bleeding edge ansible, ex: git+https://github.com/nitzmahone/ansible.git@a7d0db69142134c2e36a0a62b81a32d9442792ef
+# weird pip install thing is for supporting bleeding edge ansible, ex: git+https://github.com/ansible/ansible.git@v2.10.0
 install-ansible:
 ifeq ($(INSTALL_ANSIBLE),true)
-	@. $(ACTIVATE); [[ `pip freeze | grep ansible` == "ansible==$(ANSIBLE_VERSION)" ]] && true || (pip install ansible==$(ANSIBLE_VERSION) || pip install $(ANSIBLE_VERSION))
+	@. $(ACTIVATE); [[ `pip freeze | grep ansible` == *"$(ANSIBLE_VERSION)"* ]] || (pip install ansible==$(ANSIBLE_VERSION) || pip install $(ANSIBLE_VERSION))
 endif
+
+# only needs to be ran once, see https://github.com/ansible-collections/community.general#using-this-collection
+# without this, docker_container won't work
+# alikins is used in collections.yml
+init-community-collections:
+	@. $(ACTIVATE); ansible-galaxy collection install community.general
+	@. $(ACTIVATE); ansible-galaxy collection install alikins.collection_inspect
 
 # ensure we always have the right version of mitogen we want, and then kick off tests
 # weird '|| true' thing is because tags can't be pulled that way

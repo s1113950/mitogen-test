@@ -3,7 +3,7 @@
 # ansible-galaxy collection install alikins.collection_inspect
 # ripped from https://github.com/alikins/collection_inspect/commit/56c7aba6ec6284fb58c07f576647d81c53782218
 # How it works with vanilla ansible 2.9.6: ".venv/bin/ansible-playbook plays/collections.yml"
-# TEST=collections PLAYBOOK=collections-roles ANSIBLE_VERSION=git+git://github.com/nitzmahone/ansible.git@a7d0db69142134c2e36a0a62b81a32d9442792ef make run-test
+# TEST=collections PLAYBOOK=collections-roles ANSIBLE_VERSION=git+https://github.com/ansible/ansible.git@v2.10.0 make run-test
 
 - name: Test alikins.collection_inspect vars plugin
   vars:
