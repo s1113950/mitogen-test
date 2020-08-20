@@ -73,9 +73,11 @@ ifneq ($(USE_LOCAL_MITOGEN),)
 endif
 
 # weird pip install thing is for supporting bleeding edge ansible, ex: git+https://github.com/ansible/ansible.git@v2.10.0
+# --upgrade is added because going from ansible 2.9 to 2.10 isn't super simple, so need to uninstall first before doing that
+# then the install from github wasn't installing bin/
 install-ansible:
 ifeq ($(INSTALL_ANSIBLE),true)
-	@. $(ACTIVATE); [[ `pip freeze | grep ansible` == *"$(ANSIBLE_VERSION)"* ]] || (pip install ansible==$(ANSIBLE_VERSION) || pip install $(ANSIBLE_VERSION))
+	@. $(ACTIVATE); [[ `pip freeze | grep ansible` == *"$(ANSIBLE_VERSION)"* ]] || (pip install ansible==$(ANSIBLE_VERSION) || pip install $(ANSIBLE_VERSION) --upgrade)
 endif
 
 # only needs to be ran once, see https://github.com/ansible-collections/community.general#using-this-collection
