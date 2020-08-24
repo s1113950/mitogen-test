@@ -69,7 +69,7 @@ $(MITOGEN_INSTALL):
 
 use-local-mitogen:
 ifneq ($(USE_LOCAL_MITOGEN),)
-	@rsync -a $(USE_LOCAL_MITOGEN)/ $(MITOGEN_INSTALL_DIR)/mitogen
+	@rsync -a --delete $(USE_LOCAL_MITOGEN)/ $(MITOGEN_INSTALL_DIR)/mitogen
 endif
 
 # weird pip install thing is for supporting bleeding edge ansible, ex: git+https://github.com/ansible/ansible.git@v2.10.0
