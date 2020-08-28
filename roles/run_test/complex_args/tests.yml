@@ -1,6 +1,7 @@
 ---
 # https://github.com/dw/mitogen/pull/658
 # checks complex python vars as well as jinja in the python interpreter
+# TEST=complex_args USE_DOCKER=true make run-test
 
 - name: rerun setup if running in container to get new ansible_* vars
   setup:

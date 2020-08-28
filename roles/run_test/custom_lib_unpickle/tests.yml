@@ -1,6 +1,8 @@
 ---
 # https://github.com/dw/mitogen/issues/689
 # will run this through docker to test it on centos6, so no delegate_to since that's already called
+# TEST=custom_lib_unpickle USE_DOCKER=true CONTAINER_IMAGE=centos:6 make run-test
+
 - name: Create license file on docker host
   shell: echo "LICENSE" > /tmp/license_file.txt
 
