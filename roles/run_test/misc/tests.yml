@@ -1,17 +1,40 @@
 ---
 # place for small bugs/generic fixes
 # validates:
-# https://github.com/dw/mitogen/issues/716
+#   https://github.com/dw/mitogen/issues/716
+#   synchronize in Ansible 2.10+
+# TEST=misc CONTAINER_IMAGE=centos:7 ANSIBLE_VERSION=git+https://github.com/ansible/ansible.git@v2.10.0 make run-test
 
-### TEST 716 --> TEST=misc CONTAINER_IMAGE=centos:7 ANSIBLE_VERSION=2.4.2 PYTHON_VERSION=2 make run-test
+### TEST 716, original replication: TEST=misc CONTAINER_IMAGE=centos:7 ANSIBLE_VERSION=2.4.2 PYTHON_VERSION=2 make run-test
+# resolves Not a directory: b'/private/tmp/fileC/localhost', happens with and without Mitogen on Ansible 2.10
+# - name: make localhost dir in Mac for fetch module
+#   file:
+#     name: /tmp/fileC
+#     state: directory
+
 - name: T00.00 Prepare file
   lineinfile:
-    path: "/tmp/fileC"
+    path: "/tmp/fileC/test"
     line: "test"
     create: yes
 
 - name: T00.01 Fetch file
   fetch:
-    src: "/tmp/fileC"
-    dest: "/tmp/fileC"
+    src: "/tmp/fileC/test"
+    dest: "/tmp"
 ### END TEST 716
+
+### TEST SYNCHRONIZE
+# - name: synchronize needs rsync
+#   package:
+#     name: rsync
+
+- name: create test file for synchronize
+  file:
+    path: /tmp/dummy
+    state: touch
+
+- synchronize:
+    dest: /tmp/dummy2
+    src: /tmp/dummy
+### END TEST SYNCRONIZE
