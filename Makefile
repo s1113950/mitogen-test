@@ -85,8 +85,10 @@ endif
 # only needs to be ran once, see https://github.com/ansible-collections/community.general#using-this-collection
 # without this, docker_container won't work
 # alikins is used in collections.yml
-init-community-collections:
+init-collections:
 	@. $(ACTIVATE); ansible-galaxy collection install community.general
+	@. $(ACTIVATE); ansible-galaxy collection install ansible.netcommon
+	@. $(ACTIVATE); ansible-galaxy collection install ansible.posix
 	@. $(ACTIVATE); ansible-galaxy collection install alikins.collection_inspect
 
 # ensure we always have the right version of mitogen we want, and then kick off tests
