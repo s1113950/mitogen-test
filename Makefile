@@ -14,7 +14,6 @@ ANSIBLE_EXTRA_ARGS ?= -vv
 ANSIBLE_SSH_PASS ?= ""
 ANSIBLE_SUDO_PASS ?= $(ANSIBLE_SSH_PASS)
 # dynamically change ansible install version
-# NOTE: to get ansible 2.10.0 before it's released to `ansible` we need `ansible-base`, so get git+https://github.com/ansible/ansible.git@v2.10.0
 ANSIBLE_VERSION ?= "2.10.0"
 # set this to dynamically change user for test runs
 ANSIBLE_USER ?= ""
@@ -72,14 +71,9 @@ ifneq ($(USE_LOCAL_MITOGEN),)
 	@rsync -a --delete $(USE_LOCAL_MITOGEN)/ $(MITOGEN_INSTALL_DIR)/mitogen
 endif
 
-# weird pip install thing is for supporting bleeding edge ansible, ex: git+https://github.com/ansible/ansible.git@v2.10.0
-# --upgrade is added because going from ansible 2.9 to 2.10 isn't super simple, so need to uninstall first before doing that
-# then the install from github wasn't installing bin/
-# pip uninstall ansible is to handle ansible 2.10 being ansible-base
 install-ansible:
 ifeq ($(INSTALL_ANSIBLE),true)
-	@. $(ACTIVATE); pip uninstall -y ansible ansible-base
-	@. $(ACTIVATE); [[ `pip freeze | grep ansible` == *"$(ANSIBLE_VERSION)"* ]] || (pip install ansible==$(ANSIBLE_VERSION) || pip install $(ANSIBLE_VERSION) --upgrade)
+	@. $(ACTIVATE); [[ `pip freeze | grep ansible` == *"$(ANSIBLE_VERSION)"* ]] || pip install ansible==$(ANSIBLE_VERSION)
 endif
 
 # only needs to be ran once, see https://github.com/ansible-collections/community.general#using-this-collection

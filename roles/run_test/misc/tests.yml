@@ -27,6 +27,7 @@
 ### TEST SYNCHRONIZE, broken in ansible 2.10 via
 # AttributeError: 'get_with_context_result' object has no attribute '_shell'
 # from self._remove_tmp_path(self._connection._shell.tmpdir) on line 129 of action/__init__.py
+# works locally but not in azure, filed ticket on Mitogen to fix
 - name: create test file for synchronize
   file:
     path: /tmp/dummy
