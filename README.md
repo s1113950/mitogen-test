@@ -40,6 +40,9 @@ Validates https://github.com/dw/mitogen/issues/716
 ### perms
 Validates https://github.com/dw/mitogen/issues/734
 
+### perms-ansible-2-10
+Validates https://github.com/dw/mitogen/blob/master/tests/ansible/integration/action/fixup_perms2__copy.yml#L29 after Ansible 2.10 upgrade broke Mitogen
+
 ### wait_for_connection
 Validates https://github.com/dw/mitogen/issues/655
 
