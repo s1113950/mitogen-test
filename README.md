@@ -25,6 +25,9 @@ Defaults to `centos:8`.
 
 ## Tests in run_test
 
+### async-ansible-2-10
+Validates https://github.com/dw/mitogen/blob/master/tests/ansible/integration/async/runner_one_job.yml#L11 for Ansible 2.10
+
 ### collections
 Validates https://github.com/dw/mitogen/issues/652
 
@@ -41,7 +44,7 @@ Validates https://github.com/dw/mitogen/issues/716
 Validates https://github.com/dw/mitogen/issues/734
 
 ### perms-ansible-2-10
-Validates https://github.com/dw/mitogen/blob/master/tests/ansible/integration/action/fixup_perms2__copy.yml#L29 after Ansible 2.10 upgrade broke Mitogen
+Validates https://github.com/dw/mitogen/blob/master/tests/ansible/integration/action/fixup_perms2__copy.yml#L29 for Ansible 2.10
 
 ### wait_for_connection
 Validates https://github.com/dw/mitogen/issues/655
