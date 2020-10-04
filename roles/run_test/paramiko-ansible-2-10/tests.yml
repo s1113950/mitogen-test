@@ -1,6 +1,6 @@
 ---
 # failed after ansible 2.10 upgrade: https://github.com/dw/mitogen/blob/master/tests/ansible/integration/connection_loader/paramiko_unblemished.yml#L3
-# TEST=paramiko-ansible-2-10 ANSIBLE_VERSION=2.10.0 USE_DOCKER=false make run-test
+# TEST=paramiko-ansible-2-10 PYTHON_VERSION=2 ANSIBLE_VERSION=2.10.0 USE_DOCKER=false make run-test
 
 - custom_python_detect_environment:
   connection: paramiko
