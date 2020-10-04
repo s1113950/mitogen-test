@@ -40,6 +40,9 @@ Validates https://github.com/dw/mitogen/issues/689
 ### misc
 Validates https://github.com/dw/mitogen/issues/716
 
+### paramiko-ansible-2-10
+Validates https://github.com/dw/mitogen/blob/master/tests/ansible/integration/connection_loader/paramiko_unblemished.yml#L3 for Ansible 2.10
+
 ### perms
 Validates https://github.com/dw/mitogen/issues/734
 
