@@ -57,6 +57,9 @@ Validates https://github.com/dw/mitogen/issues/655
 ### plays/collections.yml
 Validates https://github.com/dw/mitogen/issues/652
 
+### plays/mixed-mitogen-vanilla-ansible-2-10
+Validates https://github.com/dw/mitogen/blob/master/tests/ansible/integration/strategy/_mixed_mitogen_vanilla.yml#L25 for Ansible 2.10
+
 ### ansible tests (not ansible-playbook)
 Validates https://github.com/dw/mitogen/issues/672
 

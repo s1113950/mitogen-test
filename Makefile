@@ -37,6 +37,11 @@ USE_DOCKER ?= true
 USE_LOCAL_MITOGEN ?=
 ### END VARS
 
+VIRTUALENV_DIR := .venv$(PYTHON_VERSION)
+ACTIVATE := $(VIRTUALENV_DIR)/bin/activate
+MITOGEN_INSTALL_DIR := /tmp
+MITOGEN_INSTALL := $(MITOGEN_INSTALL_DIR)/mitogen/MANIFEST.in
+
 # special test args section
 TEST_ARGS := -e test_dir=$(TEST)
 ifeq ($(TEST),complex_args)
@@ -49,12 +54,9 @@ else ifeq ($(TEST),ansible-setup)
 # sudo fails intermittently: https://github.com/dw/mitogen/issues/726#issuecomment-649221105
 else ifeq ($(TEST),ansible-setup-become)
 	TEST_ARGS := all -c docker --become -i 'testMitogen,' -e ansible_user=root -u root -m setup
+else ifeq ($(PLAYBOOK),mixed-mitogen-vanilla-ansible-2-10)
+	TEST_ARGS := -e playbook_cmd=$(VIRTUALENV_DIR)/bin/ansible-playbook -e playbook_dir=$(CURDIR)/plays -e ansible_ssh_pass=$(ANSIBLE_SSH_PASS) -e ansible_sudo_pass=$(ANSIBLE_SUDO_PASS)
 endif
-
-VIRTUALENV_DIR := .venv$(PYTHON_VERSION)
-ACTIVATE := $(VIRTUALENV_DIR)/bin/activate
-MITOGEN_INSTALL_DIR := /tmp
-MITOGEN_INSTALL := $(MITOGEN_INSTALL_DIR)/mitogen/MANIFEST.in
 
 
 $(ACTIVATE): requirements.txt $(MITOGEN_INSTALL)
