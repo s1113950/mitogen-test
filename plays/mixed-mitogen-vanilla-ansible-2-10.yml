@@ -17,8 +17,6 @@
         -vvv "{{playbook_dir}}/_mixed_mitogen_vanilla.yml"
       args:
         chdir: "{{playbook_dir}}/../"
-      environment:
-        ANSIBLE_ACTION_PLUGINS: "{{playbook_dir}}/../lib/action"
       register: out
 
     - connection: local
@@ -32,6 +30,4 @@
         -vvv "{{playbook_dir}}/_mixed_vanilla_mitogen.yml"
       args:
         chdir: "{{playbook_dir}}/../"
-      environment:
-        ANSIBLE_ACTION_PLUGINS: "{{playbook_dir}}/../lib/action"
       register: out
