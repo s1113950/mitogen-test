@@ -1,4 +1,5 @@
 # failed after ansible 2.10 upgrade: https://github.com/dw/mitogen/blob/master/tests/ansible/integration/strategy/_mixed_mitogen_vanilla.yml#L25
+# NOTE: getting weird perm issue without become: no, but there was no become: no in Mitogen's test
 # PLAYBOOK=mixed-mitogen-vanilla-ansible-2-10 ANSIBLE_VERSION=2.10.0 USE_DOCKER=false make run-test
 
 - name: integration/strategy/mixed_vanilla_mitogen.yml (linear->mitogen->linear)
@@ -6,27 +7,31 @@
   any_errors_fatal: true
   tasks:
     - connection: local
+      become: no
       command: |
         "{{playbook_cmd}}"
         -i "{{playbook_dir}}/../inventory/local"
         -e ansible_ssh_pass={{ansible_ssh_pass}}
         -e ansible_sudo_pass={{ansible_sudo_pass}}
         -e ansible_become_pass={{ansible_sudo_pass}}
-        -vvv
-        "{{playbook_dir}}/_mixed_mitogen_vanilla.yml"
+        -vvv "{{playbook_dir}}/_mixed_mitogen_vanilla.yml"
       args:
         chdir: "{{playbook_dir}}/../"
+      environment:
+        ANSIBLE_ACTION_PLUGINS: "{{playbook_dir}}/../lib/action"
       register: out
 
     - connection: local
+      become: no
       command: |
         "{{playbook_cmd}}"
         -i "{{playbook_dir}}/../inventory/local"
         -e ansible_ssh_pass={{ansible_ssh_pass}}
         -e ansible_sudo_pass={{ansible_sudo_pass}}
         -e ansible_become_pass={{ansible_sudo_pass}}
-        -vvv
-        "{{playbook_dir}}/_mixed_vanilla_mitogen.yml"
+        -vvv "{{playbook_dir}}/_mixed_vanilla_mitogen.yml"
       args:
         chdir: "{{playbook_dir}}/../"
+      environment:
+        ANSIBLE_ACTION_PLUGINS: "{{playbook_dir}}/../lib/action"
       register: out

@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/local/bin/python
 # ripped from Mitogen tests
 # I am an Ansible new-style Python module. I return details about the Python
 # interpreter I run within.
