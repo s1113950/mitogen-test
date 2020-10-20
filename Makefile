@@ -35,6 +35,11 @@ PYTHON_VERSION ?= "3"
 USE_DOCKER ?= true
 # set this to /path/to/local/mitogen/branch to use it without having to 'git commit' repeatedly
 USE_LOCAL_MITOGEN ?=
+# run with local for everything except for become_pass test
+INVENTORY_FILE ?= inventory/local
+# a way to override ssh flags. used only in tc-become-pass-ansible-2-10 to make test logic a little easier
+SSH_PASS_FLAG ?= "-k"
+SUDO_PASS_FLAG ?= "-K"
 ### END VARS
 
 VIRTUALENV_DIR := .venv$(PYTHON_VERSION)
@@ -56,6 +61,9 @@ else ifeq ($(TEST),ansible-setup-become)
 	TEST_ARGS := all -c docker --become -i 'testMitogen,' -e ansible_user=root -u root -m setup
 else ifeq ($(PLAYBOOK),mixed-mitogen-vanilla-ansible-2-10)
 	TEST_ARGS := -e playbook_cmd=$(VIRTUALENV_DIR)/bin/ansible-playbook -e playbook_dir=$(CURDIR)/plays -e ansible_ssh_pass=$(ANSIBLE_SSH_PASS) -e ansible_sudo_pass=$(ANSIBLE_SUDO_PASS)
+else ifeq ($(PLAYBOOK),tc-become-pass-ansible-2-10)
+	SSH_PASS_FLAG=""
+	SUDO_PASS_FLAG=""
 endif
 
 
@@ -94,12 +102,12 @@ ifeq ($(USE_LOCAL_MITOGEN),)
 	@cd $(MITOGEN_INSTALL_DIR)/mitogen && git fetch && git checkout $(MITOGEN_INSTALL_BRANCH) && (git pull origin $(MITOGEN_INSTALL_BRANCH) || true)
 endif
 	
-	@. $(ACTIVATE); $(ANSIBLE_COMMAND) $(ANSIBLE_EXTRA_ARGS) \
+	. $(ACTIVATE); $(ANSIBLE_COMMAND) $(ANSIBLE_EXTRA_ARGS) \
 	-e use_docker=$(USE_DOCKER) -e container_image=$(CONTAINER_IMAGE) \
 	-e container_run_command="'"'$(CONTAINER_RUN_COMMAND)'"'" \
 	$(TEST_ARGS) \
-	$(shell [[ $(ANSIBLE_COMMAND) == "ansible-playbook" ]] && echo "-b plays/$(PLAYBOOK).yml -i inventory/local") \
+	$(shell [[ $(ANSIBLE_COMMAND) == "ansible-playbook" ]] && echo "-b plays/$(PLAYBOOK).yml -i $(INVENTORY_FILE)") \
 	$(shell [ -z $(CUSTOM_CONTAINER_ARGS) ] && echo "-e custom_container_args=''" || echo "-e \"custom_container_args='$(CUSTOM_CONTAINER_ARGS)'\"") \
-	$(shell [ -z $(ANSIBLE_SSH_PASS) ] && echo "-k" || echo "-e ansible_ssh_pass=$(ANSIBLE_SSH_PASS)") \
-	$(shell [ -z $(ANSIBLE_SUDO_PASS) ] && echo "-K" || echo "-e ansible_sudo_pass=$(ANSIBLE_SUDO_PASS) -e ansible_become_pass=$(ANSIBLE_SUDO_PASS)") \
+	$(shell [ -z $(ANSIBLE_SSH_PASS) ] && echo "$(SSH_PASS_FLAG)" || echo "-e ansible_ssh_pass=$(ANSIBLE_SSH_PASS)") \
+	$(shell [ -z $(ANSIBLE_SUDO_PASS) ] && echo "$(SUDO_PASS_FLAG)" || echo "-e ansible_sudo_pass=$(ANSIBLE_SUDO_PASS) -e ansible_become_pass=$(ANSIBLE_SUDO_PASS)") \
 	$(shell [ -z $(ANSIBLE_USER) ] && echo "-u $(USER)" || echo "-e ansible_user=$(ANSIBLE_USER)")

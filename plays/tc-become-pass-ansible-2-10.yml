@@ -1,0 +1,136 @@
+---
+# failed after ansible 2.10 upgrade: https://github.com/dw/mitogen/blob/master/tests/ansible/integration/transport_config/become_pass.yml#L1
+# PLAYBOOK=tc-become-pass-ansible-2-10 SSH_PASS_FLAG= SUDO_PASS_FLAG= INVENTORY_FILE=inventory/become-pass.hosts ANSIBLE_VERSION=2.10.0 USE_DOCKER=false make run-test
+# Each case is followed by mitogen_via= case to test hostvars pass.
+
+
+# No become-pass set, defaults to "root"
+- name: integration/transport_config/become-pass.yml
+  hosts: tc-become-pass-unset
+  become: true
+  tasks:
+  - {mitogen_get_stack: {}, register: out}
+  - assert:
+      that:
+      - out.result|length == 2
+      - out.result[0].method == "ssh"
+      - out.result[1].method == "sudo"
+      - out.result[1].kwargs.password == None
+
+# Not set, unbecoming mitogen_via=
+- hosts: tc-become-pass-unset
+  become: true
+  vars: {mitogen_via: tc-become-pass-password}
+  tasks:
+  - {mitogen_get_stack: {}, register: out}
+  - assert:
+      that:
+      - out.result|length == 3
+      - out.result[0].method == "ssh"
+      - out.result[1].method == "ssh"
+      - out.result[2].method == "sudo"
+      - out.result[2].kwargs.password == None
+
+# Not set, becoming mitogen_via=
+- hosts: tc-become-pass-unset
+  become: true
+  vars: {mitogen_via: viapass@tc-become-pass-password}
+  tasks:
+  - {mitogen_get_stack: {}, register: out}
+  - assert:
+      that:
+      - out.result|length == 4
+      - out.result[0].method == "ssh"
+      - out.result[1].method == "sudo"
+      - out.result[1].kwargs.password == "apassword"
+      - out.result[2].method == "ssh"
+      - out.result[3].method == "sudo"
+      - out.result[3].kwargs.password == None
+
+
+# ansible_become_password= set.
+- hosts: tc-become-pass-password
+  become: true
+  tasks:
+  - {mitogen_get_stack: {}, register: out}
+  - assert:
+      that:
+      - out.result|length == 2
+      - out.result[0].method == "ssh"
+      - out.result[1].method == "sudo"
+      - out.result[1].kwargs.password == "apassword"
+
+
+# ansible_become_password=, via=
+- hosts: tc-become-pass-password
+  vars: {mitogen_via: root@tc-become-pass-pass}
+  become: true
+  tasks:
+  - {mitogen_get_stack: {}, register: out}
+  - assert:
+      that:
+      - out.result|length == 4
+      - out.result[0].method == "ssh"
+      - out.result[1].method == "sudo"
+      - out.result[1].kwargs.password == "apass"
+      - out.result[2].method == "ssh"
+      - out.result[3].method == "sudo"
+      - out.result[3].kwargs.password == "apassword"
+
+
+# ansible_become_pass=
+- hosts: tc-become-pass-pass
+  become: true
+  tasks:
+  - {mitogen_get_stack: {}, register: out}
+  - assert:
+      that:
+      - out.result|length == 2
+      - out.result[0].method == "ssh"
+      - out.result[1].method == "sudo"
+      - out.result[1].kwargs.password == "apass"
+
+
+# ansible_become_pass=, via=
+- hosts: tc-become-pass-pass
+  vars: {mitogen_via: root@tc-become-pass-password}
+  become: true
+  tasks:
+  - {mitogen_get_stack: {}, register: out}
+  - assert:
+      that:
+      - out.result|length == 4
+      - out.result[0].method == "ssh"
+      - out.result[1].method == "sudo"
+      - out.result[1].kwargs.password == "apassword"
+      - out.result[2].method == "ssh"
+      - out.result[3].method == "sudo"
+      - out.result[3].kwargs.password == "apass"
+
+
+
+# ansible_become_pass & ansible_become_password set, password takes precedence
+- hosts: tc-become-pass-both
+  become: true
+  tasks:
+  - {mitogen_get_stack: {}, register: out}
+  - assert:
+      that:
+      - out.result|length == 2
+      - out.result[0].method == "ssh"
+      - out.result[1].method == "sudo"
+      - out.result[1].kwargs.password == "a.b.c"
+
+
+# both, mitogen_via
+- hosts: tc-become-pass-unset
+  vars: {mitogen_via: root@tc-become-pass-both}
+  tasks:
+  - {mitogen_get_stack: {}, register: out}
+  - assert:
+      that:
+      - out.result|length == 3
+      - out.result[0].method == "ssh"
+      - out.result[1].method == "sudo"
+      - out.result[1].kwargs.password == "a.b.c"
+      - out.result[2].method == "ssh"
