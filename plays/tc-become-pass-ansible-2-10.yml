@@ -1,6 +1,6 @@
 ---
 # failed after ansible 2.10 upgrade: https://github.com/dw/mitogen/blob/master/tests/ansible/integration/transport_config/become_pass.yml#L1
-# PLAYBOOK=tc-become-pass-ansible-2-10 SSH_PASS_FLAG= SUDO_PASS_FLAG= INVENTORY_FILE=inventory/become-pass.hosts ANSIBLE_VERSION=2.10.0 USE_DOCKER=false make run-test
+# PLAYBOOK=tc-become-pass-ansible-2-10 INVENTORY_FILE=inventory/become-pass.hosts ANSIBLE_VERSION=2.10.0 USE_DOCKER=false make run-test
 # Each case is followed by mitogen_via= case to test hostvars pass.
 
 
