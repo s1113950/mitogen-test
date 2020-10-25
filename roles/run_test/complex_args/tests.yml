@@ -1,12 +1,14 @@
 ---
 # https://github.com/dw/mitogen/pull/658
 # checks complex python vars as well as jinja in the python interpreter
-# TEST=complex_args USE_DOCKER=true make run-test
+# TEST=complex_args USE_DOCKER=true (USE_DOCKER=false broke in Ansible 2.10 so test that too) make run-test
 
 - name: rerun setup if running in container to get new ansible_* vars
   setup:
   when: use_docker.lower() == 'true'
 
+- name: run setup so we can gather facts, not doing that by default anymore
+  setup:
 
 - name: test source command only available outside of container
   block:
