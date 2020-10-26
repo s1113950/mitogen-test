@@ -40,6 +40,8 @@ INVENTORY_FILE ?= inventory/local
 # a way to override ssh flags. used only in tc-become-pass-ansible-2-10 to make test logic a little easier
 SSH_PASS_FLAG ?= "-k"
 SUDO_PASS_FLAG ?= "-K"
+# if we install a lot of deps and don't want to keep rebuilding a new test container, set this to false, like for debops
+REBUILD_CONTAINER ?= true
 ### END VARS
 
 VIRTUALENV_DIR := .venv$(PYTHON_VERSION)
@@ -59,6 +61,9 @@ else ifeq ($(TEST),ansible-setup)
 # sudo fails intermittently: https://github.com/dw/mitogen/issues/726#issuecomment-649221105
 else ifeq ($(TEST),ansible-setup-become)
 	TEST_ARGS := all -c docker --become -i 'testMitogen,' -e ansible_user=root -u root -m setup
+# we need Mitogen in the debops container so we can run debops common on itself
+else ifeq ($(TEST),debops)
+	CUSTOM_CONTAINER_ARGS := "-v $(MITOGEN_INSTALL_DIR)/mitogen:/mitogen"
 else ifeq ($(PLAYBOOK),mixed-mitogen-vanilla-ansible-2-10)
 	TEST_ARGS := -e playbook_cmd=$(VIRTUALENV_DIR)/bin/ansible-playbook -e playbook_dir=$(CURDIR)/plays -e ansible_ssh_pass=$(ANSIBLE_SSH_PASS) -e ansible_sudo_pass=$(ANSIBLE_SUDO_PASS)
 else ifeq ($(PLAYBOOK),tc-become-pass-ansible-2-10)
@@ -94,6 +99,7 @@ init-collections:
 	@. $(ACTIVATE); ansible-galaxy collection install ansible.netcommon
 	@. $(ACTIVATE); ansible-galaxy collection install ansible.posix
 	@. $(ACTIVATE); ansible-galaxy collection install alikins.collection_inspect
+	@. $(ACTIVATE); ansible-galaxy collection install debops.debops
 
 # ensure we always have the right version of mitogen we want, and then kick off tests
 # weird '|| true' thing is because tags can't be pulled that way
@@ -103,7 +109,7 @@ ifeq ($(USE_LOCAL_MITOGEN),)
 endif
 	
 	@. $(ACTIVATE); $(ANSIBLE_COMMAND) $(ANSIBLE_EXTRA_ARGS) \
-	-e use_docker=$(USE_DOCKER) -e container_image=$(CONTAINER_IMAGE) \
+	-e use_docker=$(USE_DOCKER) -e container_image=$(CONTAINER_IMAGE) -e rebuild_container=$(REBUILD_CONTAINER) \
 	-e container_run_command="'"'$(CONTAINER_RUN_COMMAND)'"'" \
 	$(TEST_ARGS) \
 	$(shell [[ $(ANSIBLE_COMMAND) == "ansible-playbook" ]] && echo "-b plays/$(PLAYBOOK).yml -i $(INVENTORY_FILE)") \

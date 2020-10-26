@@ -20,39 +20,42 @@
     #     # TODO: don't force this to be python3?
     #     ansible_python_interpreter: /usr/bin/python3
 
-    - name: stopping any old test container
-      docker_container:
-        name: testMitogen
-        state: absent
-      vars:
-        ansible_python_interpreter: /usr/bin/python3
-
-    # needed more flexibility so will shell out to create container
-    - name: create test container {{ container_image }}
-      shell: /usr/local/bin/docker run -d --name testMitogen {{ custom_container_args }} --rm {{ container_image }} {{ container_run_command }}
-
-    - name: set python install cmd based on distro (example -- ubuntu 20.04 container has no python by default)
+    - name: decide whether or not to rebuild test container
       block:
-        - name: default to not installing any python
-          set_fact:
-            python_install_cmd: echo 'Mocking python install'
+        - name: stopping any old test container
+          docker_container:
+            name: testMitogen
+            state: absent
+          vars:
+            ansible_python_interpreter: /usr/bin/python3
 
-        - name: set python install cmd for rhel-based distros
-          set_fact:
-            # centos8 doesn't have the python target, and centos6 doesn't have python3 (needs rh-python3)
-            python_install_cmd: yum install -y python || (yum install -y python3 && ln -s /usr/bin/python3 /usr/bin/python)
-          when: "'centos' in container_image and not 'centos:8' in container_image"
+        # needed more flexibility so will shell out to create container
+        - name: create test container {{ container_image }}
+          shell: /usr/local/bin/docker run -d --name testMitogen {{ custom_container_args }} --rm {{ container_image }} {{ container_run_command }}
 
-        - name: set python install cmd for ubuntu distros
-          set_fact:
-            # ubuntu 14.04 can no longer hit the ubuntu update endpoint *facepalm* and installing python3 and symlinking breaks mitogen
-            python_install_cmd: (apt-get install -y python || (apt-get update && apt-get install -y python3 ca-certificates && ln -s /usr/bin/python3 /usr/bin/python))
-          when: "'ubuntu' in container_image"
+        - name: set python install cmd based on distro (example -- ubuntu 20.04 container has no python by default)
+          block:
+            - name: default to not installing any python
+              set_fact:
+                python_install_cmd: echo 'Mocking python install'
 
-    - name: install python into container for mitogen
-      shell: docker exec testMitogen sh -c "{{ python_install_cmd }}"
-      environment:
-        PATH: "{{ lookup('env', 'PATH') }}"
+            - name: set python install cmd for rhel-based distros
+              set_fact:
+                # centos8 doesn't have the python target, and centos6 doesn't have python3 (needs rh-python3)
+                python_install_cmd: yum install -y python || (yum install -y python3 && ln -s /usr/bin/python3 /usr/bin/python)
+              when: "'centos' in container_image and not 'centos:8' in container_image"
+
+            - name: set python install cmd for ubuntu distros
+              set_fact:
+                # ubuntu 14.04 can no longer hit the ubuntu update endpoint *facepalm* and installing python3 and symlinking breaks mitogen
+                python_install_cmd: ((apt-get update && apt-get install -y python3 ca-certificates && ln -s /usr/bin/python3 /usr/bin/python) || apt-get install -y python)
+              when: "'ubuntu' in container_image"
+
+        - name: install python into container for mitogen
+          shell: docker exec testMitogen sh -c "{{ python_install_cmd }}"
+          environment:
+            PATH: "{{ lookup('env', 'PATH') }}"
+      when: rebuild_container == "true"
 
     - name: add container to inventory
       add_host:

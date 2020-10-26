@@ -1,0 +1,67 @@
+---
+# TEST=debops CONTAINER_IMAGE=ubuntu:18.04 REBUILD_CONTAINER=false make run-test
+# a way to run debops the way Mitogen runs it
+# this test will run `debops common` on the desired CONTAINER_IMAGE using Mitogen
+
+- name: install pip and debops deps in container
+  block:
+    - name: install package deps
+      package:
+        name:
+          - python3-pip
+          - build-essential
+          - python3-dev
+          - libldap2-dev
+          - libsasl2-dev
+          - ldap-utils
+          - lcov
+          - valgrind
+
+    - name: install debops
+      pip:
+        name: debops[ansible]
+        version: 2.1.2
+        executable: /usr/bin/pip3
+  when: rebuild_container == "true"
+
+- name: blow away any old debops config setup
+  file:
+    name: /tmp/debops-test
+    state: absent
+
+- name: init debops
+  shell: debops-init debops-test
+  args:
+    chdir: /tmp
+
+- name: create debops config file
+  copy:
+    dest: /tmp/debops-test/.debops.cfg
+    content: |
+      [ansible defaults]
+      strategy_plugins = /mitogen/ansible_mitogen/plugins/strategy
+      strategy = mitogen_linear
+
+- name: create debops vars file
+  copy:
+    dest: /tmp/debops-test/ansible/inventory/group_vars/debops_all_hosts.yml
+    content: |
+      # Speed up slow DH generation.
+      dhparam__bits: ['128', '64']
+
+- name: create debops inventory file
+  copy:
+    dest: /tmp/debops-test/ansible/inventory/hosts
+    content: |
+        ansible_host=localhost
+
+- name: run debops common on same container twice
+  shell: "{{ item }}"
+  args:
+    chdir:
+        /tmp/debops-test
+  environment:
+    ANSIBLE_HOST_KEY_CHECKING: False
+  with_items:
+    - debops common
+    - debops common

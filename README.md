@@ -52,6 +52,9 @@ Validates https://github.com/dw/mitogen/blob/master/tests/ansible/integration/ac
 ### wait_for_connection
 Validates https://github.com/dw/mitogen/issues/655
 
+### debops
+Validates running `debops common` on a created `CONTAINER_IMAGE` using Mitogen
+
 ## Playbook-level tests
 
 ### plays/collections.yml
