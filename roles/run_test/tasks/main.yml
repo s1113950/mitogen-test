@@ -29,6 +29,10 @@
           vars:
             ansible_python_interpreter: /usr/bin/python3
 
+        - name: there's an edge case where ^^^ continues on even tho testMitogen hasn't been killed yet so wait for it
+          pause:
+            seconds: 1
+
         # needed more flexibility so will shell out to create container
         - name: create test container {{ container_image }}
           shell: /usr/local/bin/docker run -d --name testMitogen {{ custom_container_args }} --rm {{ container_image }} {{ container_run_command }}

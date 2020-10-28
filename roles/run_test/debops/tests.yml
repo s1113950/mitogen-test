@@ -3,19 +3,32 @@
 # a way to run debops the way Mitogen runs it
 # this test will run `debops common` on the desired CONTAINER_IMAGE using Mitogen
 
+- name: call setup to get ansible hostname
+  setup:
+
 - name: install pip and debops deps in container
   block:
     - name: install package deps
       package:
         name:
-          - python3-pip
+          # for debops
           - build-essential
-          - python3-dev
           - libldap2-dev
           - libsasl2-dev
           - ldap-utils
           - lcov
+          - python3-pip
+          - python3-dev
+          - slapd
           - valgrind
+          # specifically to get ansible_interfaces fact, otherwise Ansible fails silently
+          - iproute2
+      # slapd requires putting in a pw otherwise
+      environment:
+        DEBIAN_FRONTEND: noninteractive
+
+    - name: run resolveconf workaround to install in container
+      shell: echo "resolvconf resolvconf/linkify-resolvconf boolean false" | debconf-set-selections
 
     - name: install debops
       pip:
@@ -41,6 +54,8 @@
       [ansible defaults]
       strategy_plugins = /mitogen/ansible_mitogen/plugins/strategy
       strategy = mitogen_linear
+      # patch bad lookup_plugins location for debops
+      lookup_plugins = /usr/local/lib/python3.6/dist-packages/debops/ansible/roles/ansible_plugins/lookup_plugins
 
 - name: create debops vars file
   copy:
@@ -49,11 +64,10 @@
       # Speed up slow DH generation.
       dhparam__bits: ['128', '64']
 
-- name: create debops inventory file
-  copy:
-    dest: /tmp/debops-test/ansible/inventory/hosts
-    content: |
-        ansible_host=localhost
+- name: edit debops inventory file
+  lineinfile:
+    path: /tmp/debops-test/ansible/inventory/hosts
+    line: "{{ ansible_hostname }} ansible_host={{ ansible_hostname }} ansible_connection=local"
 
 - name: run debops common on same container twice
   shell: "{{ item }}"
