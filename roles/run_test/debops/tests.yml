@@ -1,5 +1,5 @@
 ---
-# TEST=debops CONTAINER_IMAGE=ubuntu:18.04 REBUILD_CONTAINER=false make run-test
+# TEST=debops CONTAINER_IMAGE=ubuntu:18.04 make run-test
 # a way to run debops the way Mitogen runs it
 # this test will run `debops common` on the desired CONTAINER_IMAGE using Mitogen
 # NOTE THIS FAILS WITH ANSIBLE 2.10: https://github.com/debops/debops/issues/1521
