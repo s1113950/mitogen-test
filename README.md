@@ -37,6 +37,12 @@ Validates patch https://github.com/dw/mitogen/pull/658
 ### custom_lib_unpickle
 Validates https://github.com/dw/mitogen/issues/689
 
+### custom-python-new-style-module-ansible-2-10
+Validates custom_python_new_style_module.yml for Ansible 2.10
+
+### debops
+Validates running `debops common` on a created `CONTAINER_IMAGE` using Mitogen. Currently fails due to a bug in debops.
+
 ### misc
 Validates https://github.com/dw/mitogen/issues/716
 
@@ -51,9 +57,6 @@ Validates https://github.com/dw/mitogen/blob/master/tests/ansible/integration/ac
 
 ### wait_for_connection
 Validates https://github.com/dw/mitogen/issues/655
-
-### debops
-Validates running `debops common` on a created `CONTAINER_IMAGE` using Mitogen
 
 ## Playbook-level tests
 

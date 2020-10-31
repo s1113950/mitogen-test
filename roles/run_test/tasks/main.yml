@@ -31,7 +31,7 @@
 
         - name: there's an edge case where ^^^ continues on even tho testMitogen hasn't been killed yet so wait for it
           pause:
-            seconds: 1
+            seconds: 2
 
         # needed more flexibility so will shell out to create container
         - name: create test container {{ container_image }}
