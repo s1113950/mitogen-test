@@ -1,0 +1,26 @@
+# failed after ansible 2.10 upgrade: https://github.com/dw/mitogen/blob/master/tests/ansible/integration/runner/missing_module.yml#L19
+# it works fine with Mitogen but breaks in vanilla Ansible
+# PLAYBOOK=missing-module-ansible-2-10 ANSIBLE_VERSION=2.10.0 USE_DOCKER=false make run-test
+---
+- name: integration/runner/missing_module.yml
+  hosts: node
+  connection: local
+  tasks:
+    - connection: local
+      become: no
+      command: |
+        "{{ansible_cmd}}" -vvv
+        -i "{{playbook_dir}}/../inventory/local"
+        -e ansible_ssh_pass={{ansible_ssh_pass}}
+        -e ansible_sudo_pass={{ansible_sudo_pass}}
+        -e ansible_become_pass={{ansible_sudo_pass}}
+        -m missing_module
+        node
+      args:
+        chdir: "{{playbook_dir}}/../"
+      register: out
+      ignore_errors: true
+
+    - assert:
+        that: |
+          'The module missing_module was not found in configured module paths' in out.stdout

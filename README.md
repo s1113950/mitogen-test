@@ -63,6 +63,9 @@ Validates https://github.com/dw/mitogen/issues/655
 ### plays/collections.yml
 Validates https://github.com/dw/mitogen/issues/652
 
+### plays/missing-module-ansible-2-10
+Validates https://github.com/dw/mitogen/blob/master/tests/ansible/integration/runner/missing_module.yml#L19, Ansible 2.10 removed the `.` in the error msg
+
 ### plays/mixed-mitogen-vanilla-ansible-2-10
 Validates https://github.com/dw/mitogen/blob/master/tests/ansible/integration/strategy/_mixed_mitogen_vanilla.yml#L25 for Ansible 2.10
 

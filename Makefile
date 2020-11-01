@@ -69,6 +69,8 @@ else ifeq ($(PLAYBOOK),mixed-mitogen-vanilla-ansible-2-10)
 else ifeq ($(PLAYBOOK),tc-become-pass-ansible-2-10)
 	SSH_PASS_FLAG=""
 	SUDO_PASS_FLAG=""
+else ifeq ($(PLAYBOOK),missing-module-ansible-2-10)
+	TEST_ARGS := -e ansible_cmd=$(VIRTUALENV_DIR)/bin/ansible -e playbook_dir=$(CURDIR)/plays -e ansible_ssh_pass=$(ANSIBLE_SSH_PASS) -e ansible_sudo_pass=$(ANSIBLE_SUDO_PASS)
 endif
 
 
