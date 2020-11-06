@@ -16,6 +16,8 @@ Set `CONTAINER_IMAGE` (optionally) to one of the following:
 
 `ubuntu{14.04|16.04|18.04|19.10|20.04}`
 
+`debian:{9}`
+
 `roboxes/rhel8:2.0.6`
 
 `willhallonline/ansible:2.9-alpine` from https://github.com/dw/mitogen/issues/673#issuecomment-633248152

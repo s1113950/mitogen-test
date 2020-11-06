@@ -53,7 +53,7 @@
               set_fact:
                 # ubuntu 14.04 can no longer hit the ubuntu update endpoint *facepalm* and installing python3 and symlinking breaks mitogen
                 python_install_cmd: ((apt-get update && apt-get install -y python3 ca-certificates && ln -s /usr/bin/python3 /usr/bin/python) || apt-get install -y python)
-              when: "'ubuntu' in container_image"
+              when: "'ubuntu' in container_image or 'debian' in container_image"
 
         - name: install python into container for mitogen
           shell: docker exec testMitogen sh -c "{{ python_install_cmd }}"
