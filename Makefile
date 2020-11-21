@@ -56,8 +56,10 @@ ifeq ($(TEST),complex_args)
 else ifeq ($(TEST),custom_lib_unpickle)
     TEST_ARGS := $(TEST_ARGS)
 # https://github.com/dw/mitogen/issues/672: "ansible localhost -m setup" broke in a python3.5 env with Mitogen
+# a way to reproduce https://github.com/dw/mitogen/pull/715#issuecomment-730455539
+# TEST=ansible-setup USE_DOCKER=true ANSIBLE_EXTRA_ARGS="-v" CONTAINER_IMAGE=debian:9 REBUILD_CONTAINER=false ANSIBLE_COMMAND=ansible make run-test
 else ifeq ($(TEST),ansible-setup)
-	TEST_ARGS := all -c docker -i 'testMitogen,' -e ansible_user=root -e ansible_python_interpreter=/usr/local/bin/python3 -m setup
+	TEST_ARGS := all -c docker -i 'testMitogen,' -e ansible_user=root -m setup
 # sudo fails intermittently: https://github.com/dw/mitogen/issues/726#issuecomment-649221105
 else ifeq ($(TEST),ansible-setup-become)
 	TEST_ARGS := all -c docker --become -i 'testMitogen,' -e ansible_user=root -u root -m setup

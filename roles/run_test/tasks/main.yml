@@ -46,13 +46,13 @@
             - name: set python install cmd for rhel-based distros
               set_fact:
                 # centos8 doesn't have the python target, and centos6 doesn't have python3 (needs rh-python3)
-                python_install_cmd: yum install -y python || (yum install -y python3 && ln -s /usr/bin/python3 /usr/bin/python)
+                python_install_cmd: yum install -y python || yum install -y python3
               when: "'centos' in container_image and not 'centos:8' in container_image"
 
             - name: set python install cmd for ubuntu distros
               set_fact:
                 # ubuntu 14.04 can no longer hit the ubuntu update endpoint *facepalm* and installing python3 and symlinking breaks mitogen
-                python_install_cmd: ((apt-get update && apt-get install -y python3 ca-certificates && ln -s /usr/bin/python3 /usr/bin/python) || apt-get install -y python)
+                python_install_cmd: ((apt-get update && apt-get install -y python3 ca-certificates) || apt-get install -y python)
               when: "'ubuntu' in container_image or 'debian' in container_image"
 
         - name: install python into container for mitogen
