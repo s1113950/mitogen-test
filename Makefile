@@ -59,7 +59,7 @@ else ifeq ($(TEST),custom_lib_unpickle)
 # a way to reproduce https://github.com/dw/mitogen/pull/715#issuecomment-730455539
 # TEST=ansible-setup USE_DOCKER=true ANSIBLE_EXTRA_ARGS="-v" CONTAINER_IMAGE=debian:9 REBUILD_CONTAINER=false ANSIBLE_COMMAND=ansible make run-test
 else ifeq ($(TEST),ansible-setup)
-	TEST_ARGS := all -c docker -i 'testMitogen,' -e ansible_user=root -m setup
+	TEST_ARGS := all -c docker -i 'testMitogen,' -e ansible_user=root -m ansible.builtin.setup
 # sudo fails intermittently: https://github.com/dw/mitogen/issues/726#issuecomment-649221105
 else ifeq ($(TEST),ansible-setup-become)
 	TEST_ARGS := all -c docker --become -i 'testMitogen,' -e ansible_user=root -u root -m setup
@@ -92,7 +92,7 @@ endif
 
 install-ansible:
 ifeq ($(INSTALL_ANSIBLE),true)
-	@. $(ACTIVATE); [[ `pip freeze | grep ansible` == *"$(ANSIBLE_VERSION)"* ]] || pip install ansible==$(ANSIBLE_VERSION)
+	@. $(ACTIVATE); [[ `pip freeze | grep ansible` == *"$(ANSIBLE_VERSION)"* ]] || (pip uninstall -y ansible-base || true) && pip install ansible==$(ANSIBLE_VERSION)
 endif
 
 # only needs to be ran once, see https://github.com/ansible-collections/community.general#using-this-collection
